@@ -8,6 +8,8 @@
 # production
 /build
 /dist
+/node_modules
+.github
 
 # testing
 /coverage
@@ -20,3 +22,8 @@
 .env.production.local
 
 npm-debug.log*
+
+/firebase-debug.log
+.firebaserc
+/firebase.json
+.firebase
