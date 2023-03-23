@@ -266,7 +266,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
         argsUser.writeNumber(data.s_rate) //s_rate todo change on actual srate
         argsUser.writeNumber(data.b_rate)//b_rate todo
 
-        // let assetBalanceUsdt = BigInt(0);
+        let accountAssetBalanceUsdtData = BigInt(0);
 
         try {
             const accountAssetBalanceUsdt = await toncenter.runMethod(
@@ -275,7 +275,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 argsUser.build(),
             );
 
-            // assetBalanceUsdt = BigInt(accountAssetBalanceUsdt.stack.readNumber());
+            accountAssetBalanceUsdtData = BigInt(accountAssetBalanceUsdt.stack.readNumber());
         } catch (e) {
             console.log('error with getAccountAssetBalance', e)
         }
@@ -286,7 +286,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
         argsUser2.writeNumber(data.s_rate) //s_rate todo change on actual srate
         argsUser2.writeNumber(data.b_rate)//b_rate todo
 
-        // let assetBalanceTon = BigInt(0);
+        let accountAssetBalanceTonData = BigInt(0);
 
         try {
             const accountAssetBalanceTon = await toncenter.runMethod(
@@ -295,13 +295,13 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 argsUser2.build(),
             );
 
-            // assetBalanceTon = BigInt(accountAssetBalanceTon.stack.readNumber());
+            accountAssetBalanceTonData = BigInt(accountAssetBalanceTon.stack.readNumber());
         } catch (e) {
             console.log('error with getAccountAssetBalance', e)
         }
 
 
-        console.log(assetBalanceUsdt + " usdt") //asset balance
+        console.log(accountAssetBalanceTonData + " ton") //asset balance
         console.log(assetBalanceTon + " ton") //asset balance
 
         console.log('8--------ACCOUNT BALANCES-------')
@@ -475,7 +475,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const newMySupply = {
             id: 'fir12312321st',
             token: Token.TON,
-            balance: parseFloat((Number(assetBalanceTon) / VALUE_DECIMAL).toString()).toFixed(2),
+            balance: parseFloat((Number(accountAssetBalanceTonData) / VALUE_DECIMAL).toString()).toFixed(2),
             apy: apy_ton_supply,
             earned: '13',
         };
@@ -487,7 +487,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const myBorrows = [{
             id: 'firs12122t',
             token: Token.USDT,
-            balance: Math.abs(Number(parseFloat((Number(assetBalanceUsdt) / BALANCE_DECIMAL).toString()).toFixed(2))).toString(),
+            balance: Math.abs(Number(parseFloat((Number(accountAssetBalanceUsdtData) / BALANCE_DECIMAL).toString()).toFixed(2))).toString(),
             apy: apy_usdt_borrow,
             accrued: '22',
         }];
