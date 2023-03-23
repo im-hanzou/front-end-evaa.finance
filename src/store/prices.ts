@@ -3,10 +3,12 @@ import { create } from 'zustand';
 
 import TONLogo from '../assets/pictures/ton_asset.png';
 import USDTLogo from '../assets/pictures/usdt_asset.png';
+import TOSLogo from '../assets/pictures/tos_asset.png'
 
 export enum Token {
     TON,
     USDT,
+    TOS,
 }
 
 export const TokenMap = {
@@ -19,6 +21,11 @@ export const TokenMap = {
         ticker: 'USDT',
         tokenId: 'usdt',
         icon: USDTLogo
+    },
+    [Token.TOS]: {
+        ticker: 'TOS',
+        tokenId: 'tos',
+        icon: TOSLogo
     }
 };
 

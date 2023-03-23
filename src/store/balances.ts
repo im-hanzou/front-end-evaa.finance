@@ -117,17 +117,17 @@ interface BalanceStore {
     tonBalance: string;
     usdtBalance: string;
     userAddress?: Address;
-    apyBorrow:{
+    apyBorrow: {
         [key in Token]?: number
     }
-    apySupply:{
+    apySupply: {
         [key in Token]?: number
     }
     forceUpdateData: () => void;
 }
 
 export const useBalance = create<BalanceStore>((set, get) => {
-    
+
     const updateData = async () => {
         const userContractAddress_test = contractAddress(0, {
             code: masterContractCode,
@@ -179,218 +179,218 @@ export const useBalance = create<BalanceStore>((set, get) => {
         console.log(data.price);
         console.log('2-----------POOL METADATA----');
 
-         //@ts-ignore
-         const conf = stack.pop().cell.beginParse()
-         const metadata = hex2a(conf.loadRef().beginParse().toString().slice(2).slice(0, -1))
-         console.log(metadata)
- 
-         console.log('3-------ASSET CONFIG-------')
- 
-         conf.loadRef()
-         const confItems = conf.loadRef().beginParse()
- 
-         const dictConf = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), { //asset config
-             serialize: (src: any, buidler: any) => {
-                 buidler.storeSlice(src);
-             },
-             parse: (src: Slice) => {
-                 const oracle = src.loadAddress();             //store_slice(oracle)
-                 const decimals = BigInt(src.loadUint(8));             //.store_uint(decimals, 8)
-                 const ref = src.loadRef().beginParse();       //.store_ref(begin_cell()
-                 const collateralFactor = BigInt(ref.loadUint(16));    //.store_uint(collateral_factor, 16) 
-                 const liquidationThreshold = BigInt(ref.loadUint(16));//.store_uint(liquidation_threshold, 16) 
-                 const liquidationPenalty = BigInt(ref.loadUint(16));  // .store_uint(liquidation_penalty, 16)
-                 const baseBorrowRate = BigInt(ref.loadUint(64));      //.store_uint(base_borrow_rate, 64) 
-                 const borrowRateSlopeLow = BigInt(ref.loadUint(64));  //.store_uint(borrow_rate_slope_low, 64) 
-                 const borrowRateSlopeHigh = BigInt(ref.loadUint(64)); //.store_uint(supply_rate_slope_low, 64) 
-                 const supplyRateSlopeLow = BigInt(ref.loadUint(64));  //.store_uint(supply_rate_slope_low, 64) 
-                 const supplyRateSlopeHigh = BigInt(ref.loadUint(64)); //.store_uint(supply_rate_slope_high, 64) 
-                 const targeUtilization = BigInt(ref.loadUint(64));    //.store_uint(target_utilization, 64) 
- 
-                 return {
-                     oracle, decimals, collateralFactor, liquidationThreshold,
-                     liquidationPenalty, baseBorrowRate, borrowRateSlopeLow,
-                     borrowRateSlopeHigh, supplyRateSlopeLow, supplyRateSlopeHigh, targeUtilization
-                 };
-             }
-             //@ts-ignore
-         }, confItems.loadRef().beginParse())
- 
-         // get asset config by address -------
-         console.log(dictConf.get(bufferToBigInt((await usdt).hash)))
-         console.log('4-----------IS POOL ACTIVE?----')
-         console.log(confItems.loadInt(8) === -1) //if pool active = -1 (true) / 0 (false)
-         console.log('5----SRATE BRATE PER SEC BY ASSET----')
- 
-         const dictRates = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), {
-             serialize: (src: any, buidler: any) => {
-                 buidler.storeSlice(src);
-             },
-             parse: (src: Slice) => {
-                 const s_rate_per_second = BigInt(src.loadUint(64)); //s_rate_per_second 64bit
-                 const b_rate_per_second = BigInt(src.loadUint(64)); //b_rate_per_second 64bit
-                 return { s_rate_per_second, b_rate_per_second };
-             }
-         }, stack.readCellOpt())
- 
-         console.log(dictRates.get(bufferToBigInt((await usdt).hash)))
-         const ratesPerSecondDataUsdt = dictRates.get(bufferToBigInt((await usdt).hash));
-         console.log(dictRates.get(bufferToBigInt(ton.hash)))
-         const ratesPerSecondDataTon = dictRates.get(bufferToBigInt(ton.hash));
- 
- 
-         console.log('6---------RESERVE BY ASSET------')
-         const dictReserves = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), {
-             serialize: (src: any, buidler: any) => {
-                 buidler.storeSlice(src);
-             },
-             parse: (src: Slice) => {
-                 const reserve = BigInt(src.loadInt(65)); //s_rate_per_second 64bit
-                 return { reserve };
-             }
-         }, stack.readCellOpt())
- 
-         const assetReserveUsdt = dictReserves.get(bufferToBigInt((await usdt).hash)).reserve;
-         const assetReserveTon = dictReserves.get(bufferToBigInt(ton.hash)).reserve;
-         console.log(assetReserveUsdt, "usdt");
-         console.log(assetReserveTon, "ton");
- 
- 
-         console.log('7----ACCOUNT ASSET BALANCE-----------')
-         let argsUser = new TupleBuilder();
-         argsUser.writeAddress(await usdt);
-         argsUser.writeNumber(data.s_rate) //s_rate todo change on actual srate
-         argsUser.writeNumber(data.b_rate)//b_rate todo
- 
-         let assetBalanceUsdt = BigInt(0);
- 
-         try {
-             const accountAssetBalanceUsdt = await toncenter.runMethod(
-                 userContractAddress_test,
-                 'getAccountAssetBalance',
-                 argsUser.build(),
-             );
- 
-             assetBalanceUsdt = BigInt(accountAssetBalanceUsdt.stack.readNumber());
-         } catch (e) {
-             console.log('error with getAccountAssetBalance', e)
-         }
- 
- 
-         let argsUser2 = new TupleBuilder();
-         argsUser2.writeAddress(ton);
-         argsUser2.writeNumber(data.s_rate) //s_rate todo change on actual srate
-         argsUser2.writeNumber(data.b_rate)//b_rate todo
- 
-         let assetBalanceTon = BigInt(0);
- 
-         try {
-             const accountAssetBalanceTon = await toncenter.runMethod(
-                 userContractAddress_test,
-                 'getAccountAssetBalance',
-                 argsUser2.build(),
-             );
- 
-             assetBalanceTon = BigInt(accountAssetBalanceTon.stack.readNumber());
-         } catch (e) {
-             console.log('error with getAccountAssetBalance', e)
-         }
- 
- 
-         console.log(assetBalanceUsdt + " usdt") //asset balance
-         console.log(assetBalanceTon + " ton") //asset balance
- 
-         console.log('8--------ACCOUNT BALANCES-------')
- 
-         let argsUserBalances = new TupleBuilder();
-         const asdf = beginCell().storeDictDirect(dict, Dictionary.Keys.BigUint(256), {
-             serialize: (src: any, buidler: Builder) => {
-                 buidler.storeUint(src.price, 64);
-                 buidler.storeUint(src.s_rate, 64);
-                 buidler.storeUint(src.b_rate, 64);
-                 buidler.storeUint(src.totalSupply, 64);
-                 buidler.storeUint(src.totalBorrow, 64);
-                 buidler.storeUint(src.lastAccural, 32);
-                 buidler.storeUint(src.balance, 64);
-             },
-             parse: (src: Slice) => {
-                 return 0;
-             }
-         }).endCell();
-         argsUserBalances.writeCell(asdf);
+        //@ts-ignore
+        const conf = stack.pop().cell.beginParse()
+        const metadata = hex2a(conf.loadRef().beginParse().toString().slice(2).slice(0, -1))
+        console.log(metadata)
 
-         console.log('9---------AVL TO BORROW ------')
-         let argsUserAvl = new TupleBuilder();
-         const asdf_config = beginCell().storeDictDirect(dictConf, Dictionary.Keys.BigUint(256), {
-             serialize: (src: any, buidler: Builder) => {
-                 console.log(src)
-                 buidler.storeAddress(src.oracle);
-                 buidler.storeUint(src.decimals, 8);
-                 const refBuild = beginCell();
-                 refBuild.storeUint(src.collateralFactor, 16);
-                 refBuild.storeUint(src.liquidationThreshold, 16);
-                 refBuild.storeUint(src.liquidationPenalty, 16);
-                 refBuild.storeUint(src.baseBorrowRate, 64);
-                 refBuild.storeUint(src.borrowRateSlopeLow, 64);
-                 refBuild.storeUint(src.borrowRateSlopeHigh, 64);
-                 refBuild.storeUint(src.supplyRateSlopeLow, 64);
-                 refBuild.storeUint(src.supplyRateSlopeHigh, 64);
-                 refBuild.storeUint(src.targeUtilization, 64);
-                 buidler.storeRef(refBuild.endCell())
-             },
-             parse: (src: Slice) => {
-                 return 0;
-             }
-         }).endCell();
-         argsUserAvl.writeCell(asdf_config);
-         argsUserAvl.writeCell(asdf);
- 
-         let availableToBorrowData = BigInt(0);
-         try {
-             let stackUserAvlToBorr = await toncenter.runMethod(
-                 userContractAddress_test,
-                 'getAvailableToBorrow',
-                 argsUserAvl.build(),
-             );
- 
-             availableToBorrowData = BigInt(stackUserAvlToBorr.stack.readNumber());
-         } catch (e) {
-             console.log('error with getAvailableToBorrow', e)
-         }
- 
- 
-         console.log('10---------agregated balances------')
-         let argsUserBalanceas = new TupleBuilder();
- 
-         argsUserBalanceas.writeCell(asdf_config);
-         argsUserBalanceas.writeCell(asdf);
- 
-         let aggregatedBalance1 = 0;
-         let aggregatedBalance2 = 0;
-         try {
-             const getAggregatedBalances = await toncenter.runMethod(
-                 userContractAddress_test,
-                 'getAggregatedBalances',
-                 argsUserBalanceas.build(),
-             );
-             aggregatedBalance1 = getAggregatedBalances.stack.readNumber();// agregatedbalances 
-             aggregatedBalance2 = getAggregatedBalances.stack.readNumber();// agregatedbalances   
-             console.log(aggregatedBalance1, aggregatedBalance2);
-         } catch (e) {
-             console.log('error with getAggregatedBalances', e)
-         }
- 
-         argsUserAvl.writeCell(asdf);
-         argsUserAvl.writeCell(asdf_config);
-         argsUserAvl.writeAddress(await usdt);
-         argsUserAvl.writeNumber(10);
+        console.log('3-------ASSET CONFIG-------')
 
-         const apy_usdt_supply = Number((((Number(ratesPerSecondDataUsdt.s_rate_per_second) * 360 * 24 + 1) ^ 365 - 1) / SEC_DECIMAL).toFixed(3));
-         const apy_ton_supply = Number((((Number(ratesPerSecondDataTon.s_rate_per_second) * 360 * 24 + 1) ^ 365 - 1) / VALUE_DECIMAL).toFixed(2));
-         set({apySupply:{ [Token.TON]: apy_ton_supply, [Token.USDT]: apy_usdt_supply }})
- 
+        conf.loadRef()
+        const confItems = conf.loadRef().beginParse()
 
-         const supplies = [{
+        const dictConf = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), { //asset config
+            serialize: (src: any, buidler: any) => {
+                buidler.storeSlice(src);
+            },
+            parse: (src: Slice) => {
+                const oracle = src.loadAddress();             //store_slice(oracle)
+                const decimals = BigInt(src.loadUint(8));             //.store_uint(decimals, 8)
+                const ref = src.loadRef().beginParse();       //.store_ref(begin_cell()
+                const collateralFactor = BigInt(ref.loadUint(16));    //.store_uint(collateral_factor, 16) 
+                const liquidationThreshold = BigInt(ref.loadUint(16));//.store_uint(liquidation_threshold, 16) 
+                const liquidationPenalty = BigInt(ref.loadUint(16));  // .store_uint(liquidation_penalty, 16)
+                const baseBorrowRate = BigInt(ref.loadUint(64));      //.store_uint(base_borrow_rate, 64) 
+                const borrowRateSlopeLow = BigInt(ref.loadUint(64));  //.store_uint(borrow_rate_slope_low, 64) 
+                const borrowRateSlopeHigh = BigInt(ref.loadUint(64)); //.store_uint(supply_rate_slope_low, 64) 
+                const supplyRateSlopeLow = BigInt(ref.loadUint(64));  //.store_uint(supply_rate_slope_low, 64) 
+                const supplyRateSlopeHigh = BigInt(ref.loadUint(64)); //.store_uint(supply_rate_slope_high, 64) 
+                const targeUtilization = BigInt(ref.loadUint(64));    //.store_uint(target_utilization, 64) 
+
+                return {
+                    oracle, decimals, collateralFactor, liquidationThreshold,
+                    liquidationPenalty, baseBorrowRate, borrowRateSlopeLow,
+                    borrowRateSlopeHigh, supplyRateSlopeLow, supplyRateSlopeHigh, targeUtilization
+                };
+            }
+            //@ts-ignore
+        }, confItems.loadRef().beginParse())
+
+        // get asset config by address -------
+        console.log(dictConf.get(bufferToBigInt((await usdt).hash)))
+        console.log('4-----------IS POOL ACTIVE?----')
+        console.log(confItems.loadInt(8) === -1) //if pool active = -1 (true) / 0 (false)
+        console.log('5----SRATE BRATE PER SEC BY ASSET----')
+
+        const dictRates = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), {
+            serialize: (src: any, buidler: any) => {
+                buidler.storeSlice(src);
+            },
+            parse: (src: Slice) => {
+                const s_rate_per_second = BigInt(src.loadUint(64)); //s_rate_per_second 64bit
+                const b_rate_per_second = BigInt(src.loadUint(64)); //b_rate_per_second 64bit
+                return { s_rate_per_second, b_rate_per_second };
+            }
+        }, stack.readCellOpt())
+
+        console.log(dictRates.get(bufferToBigInt((await usdt).hash)))
+        const ratesPerSecondDataUsdt = dictRates.get(bufferToBigInt((await usdt).hash));
+        console.log(dictRates.get(bufferToBigInt(ton.hash)))
+        const ratesPerSecondDataTon = dictRates.get(bufferToBigInt(ton.hash));
+
+
+        console.log('6---------RESERVE BY ASSET------')
+        const dictReserves = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), {
+            serialize: (src: any, buidler: any) => {
+                buidler.storeSlice(src);
+            },
+            parse: (src: Slice) => {
+                const reserve = BigInt(src.loadInt(65)); //s_rate_per_second 64bit
+                return { reserve };
+            }
+        }, stack.readCellOpt())
+
+        const assetReserveUsdt = dictReserves.get(bufferToBigInt((await usdt).hash)).reserve;
+        const assetReserveTon = dictReserves.get(bufferToBigInt(ton.hash)).reserve;
+        console.log(assetReserveUsdt, "usdt");
+        console.log(assetReserveTon, "ton");
+
+
+        console.log('7----ACCOUNT ASSET BALANCE-----------')
+        let argsUser = new TupleBuilder();
+        argsUser.writeAddress(await usdt);
+        argsUser.writeNumber(data.s_rate) //s_rate todo change on actual srate
+        argsUser.writeNumber(data.b_rate)//b_rate todo
+
+        let assetBalanceUsdt = BigInt(0);
+
+        try {
+            const accountAssetBalanceUsdt = await toncenter.runMethod(
+                userContractAddress_test,
+                'getAccountAssetBalance',
+                argsUser.build(),
+            );
+
+            assetBalanceUsdt = BigInt(accountAssetBalanceUsdt.stack.readNumber());
+        } catch (e) {
+            console.log('error with getAccountAssetBalance', e)
+        }
+
+
+        let argsUser2 = new TupleBuilder();
+        argsUser2.writeAddress(ton);
+        argsUser2.writeNumber(data.s_rate) //s_rate todo change on actual srate
+        argsUser2.writeNumber(data.b_rate)//b_rate todo
+
+        let assetBalanceTon = BigInt(0);
+
+        try {
+            const accountAssetBalanceTon = await toncenter.runMethod(
+                userContractAddress_test,
+                'getAccountAssetBalance',
+                argsUser2.build(),
+            );
+
+            assetBalanceTon = BigInt(accountAssetBalanceTon.stack.readNumber());
+        } catch (e) {
+            console.log('error with getAccountAssetBalance', e)
+        }
+
+
+        console.log(assetBalanceUsdt + " usdt") //asset balance
+        console.log(assetBalanceTon + " ton") //asset balance
+
+        console.log('8--------ACCOUNT BALANCES-------')
+
+        let argsUserBalances = new TupleBuilder();
+        const asdf = beginCell().storeDictDirect(dict, Dictionary.Keys.BigUint(256), {
+            serialize: (src: any, buidler: Builder) => {
+                buidler.storeUint(src.price, 64);
+                buidler.storeUint(src.s_rate, 64);
+                buidler.storeUint(src.b_rate, 64);
+                buidler.storeUint(src.totalSupply, 64);
+                buidler.storeUint(src.totalBorrow, 64);
+                buidler.storeUint(src.lastAccural, 32);
+                buidler.storeUint(src.balance, 64);
+            },
+            parse: (src: Slice) => {
+                return 0;
+            }
+        }).endCell();
+        argsUserBalances.writeCell(asdf);
+
+        console.log('9---------AVL TO BORROW ------')
+        let argsUserAvl = new TupleBuilder();
+        const asdf_config = beginCell().storeDictDirect(dictConf, Dictionary.Keys.BigUint(256), {
+            serialize: (src: any, buidler: Builder) => {
+                console.log(src)
+                buidler.storeAddress(src.oracle);
+                buidler.storeUint(src.decimals, 8);
+                const refBuild = beginCell();
+                refBuild.storeUint(src.collateralFactor, 16);
+                refBuild.storeUint(src.liquidationThreshold, 16);
+                refBuild.storeUint(src.liquidationPenalty, 16);
+                refBuild.storeUint(src.baseBorrowRate, 64);
+                refBuild.storeUint(src.borrowRateSlopeLow, 64);
+                refBuild.storeUint(src.borrowRateSlopeHigh, 64);
+                refBuild.storeUint(src.supplyRateSlopeLow, 64);
+                refBuild.storeUint(src.supplyRateSlopeHigh, 64);
+                refBuild.storeUint(src.targeUtilization, 64);
+                buidler.storeRef(refBuild.endCell())
+            },
+            parse: (src: Slice) => {
+                return 0;
+            }
+        }).endCell();
+        argsUserAvl.writeCell(asdf_config);
+        argsUserAvl.writeCell(asdf);
+
+        let availableToBorrowData = BigInt(0);
+        try {
+            let stackUserAvlToBorr = await toncenter.runMethod(
+                userContractAddress_test,
+                'getAvailableToBorrow',
+                argsUserAvl.build(),
+            );
+
+            availableToBorrowData = BigInt(stackUserAvlToBorr.stack.readNumber());
+        } catch (e) {
+            console.log('error with getAvailableToBorrow', e)
+        }
+
+
+        console.log('10---------agregated balances------')
+        let argsUserBalanceas = new TupleBuilder();
+
+        argsUserBalanceas.writeCell(asdf_config);
+        argsUserBalanceas.writeCell(asdf);
+
+        let aggregatedBalance1 = 0;
+        let aggregatedBalance2 = 0;
+        try {
+            const getAggregatedBalances = await toncenter.runMethod(
+                userContractAddress_test,
+                'getAggregatedBalances',
+                argsUserBalanceas.build(),
+            );
+            aggregatedBalance1 = getAggregatedBalances.stack.readNumber();// agregatedbalances 
+            aggregatedBalance2 = getAggregatedBalances.stack.readNumber();// agregatedbalances   
+            console.log(aggregatedBalance1, aggregatedBalance2);
+        } catch (e) {
+            console.log('error with getAggregatedBalances', e)
+        }
+
+        argsUserAvl.writeCell(asdf);
+        argsUserAvl.writeCell(asdf_config);
+        argsUserAvl.writeAddress(await usdt);
+        argsUserAvl.writeNumber(10);
+
+        const apy_usdt_supply = Number((((Number(ratesPerSecondDataUsdt.s_rate_per_second) * 360 * 24 + 1) ^ 365 - 1) / SEC_DECIMAL).toFixed(3));
+        const apy_ton_supply = Number((((Number(ratesPerSecondDataTon.s_rate_per_second) * 360 * 24 + 1) ^ 365 - 1) / VALUE_DECIMAL).toFixed(2));
+        set({ apySupply: { [Token.TON]: apy_ton_supply, [Token.USDT]: apy_usdt_supply } })
+
+
+        const supplies = [{
             id: 'dkdskasdk',
             token: Token.TON,
             balance: Number(get().tonBalance).toFixed(2),
@@ -400,6 +400,12 @@ export const useBalance = create<BalanceStore>((set, get) => {
             token: Token.USDT,
             balance: Number(get().usdtBalance).toFixed(2),
             apy: Number(apy_usdt_supply),
+        },
+        {
+            id: 'dkdskas123123d112k',
+            token: Token.TOS,
+            balance: '0',
+            apy: 0,
         }];
 
         set({ supplies });
@@ -409,13 +415,13 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const apy_usdt_borrow = ((apy_usdt_borrow_math * 360 * 24 + 1) ^ 365 - 1) / 10000;
         const apy_ton_borrow_math = Number(ratesPerSecondDataTon.b_rate_per_second) / VALUE_DECIMAL;
         const apy_ton_borrow = Number((((apy_ton_borrow_math * 360 * 24 + 1) ^ 365 - 1) / 10000000).toFixed(4));
-        set({apyBorrow: { [Token.TON]: apy_ton_borrow, [Token.USDT]: apy_usdt_borrow }})        
-        
+        set({ apyBorrow: { [Token.TON]: apy_ton_borrow, [Token.USDT]: apy_usdt_borrow } })
+
 
         const liquidity_usdt = (Math.abs(Number(assetBalanceUsdt) - Number(assetReserveUsdt)) / BALANCE_DECIMAL).toFixed(2);
         const liquidity_ton = (Math.abs(Number(assetBalanceTon) - Number(assetReserveTon)) / BALANCE_DECIMAL / 1000).toFixed(2);
 
-        
+
         const borrows = [{
             id: '1211ccc1',
             token: Token.USDT,
@@ -427,13 +433,19 @@ export const useBalance = create<BalanceStore>((set, get) => {
             token: Token.TON,
             liquidity: liquidity_ton,
             apy: apy_ton_borrow,
+        },
+        {
+            id: '1211ccc11212311',
+            token: Token.TOS,
+            liquidity: '0',
+            apy: 0,
         }];
 
         set({ borrows })
 
-///////////////////////////////////
+        ///////////////////////////////////
         if (!get()?.userAddress) {
-            
+
             // not initialized yet, just skip this update cycle
             return;
         }
@@ -449,13 +461,13 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const totalLimit = limitUsed + Number(borrowBalance);
 
         const borrowLimitValue = totalLimit;
-        
+
         set({ borrowLimitValue });
         if (totalLimit !== 0) {
             const borrowLimitPercent = Math.abs(limitUsed) / totalLimit;
             set({ borrowLimitPercent });
         }
-       
+
         const newMySupply = {
             id: 'fir12312321st',
             token: Token.TON,
@@ -468,13 +480,13 @@ export const useBalance = create<BalanceStore>((set, get) => {
         set({ mySupplies });
 
 
-        const myBorrows =[{
-                id: 'firs12122t',
-                token: Token.USDT,
-                balance: Math.abs(Number(parseFloat((Number(assetBalanceUsdt) / BALANCE_DECIMAL).toString()).toFixed(2))).toString(),
-                apy: apy_usdt_borrow,
-                accrued: '22',
-            }];
+        const myBorrows = [{
+            id: 'firs12122t',
+            token: Token.USDT,
+            balance: Math.abs(Number(parseFloat((Number(assetBalanceUsdt) / BALANCE_DECIMAL).toString()).toFixed(2))).toString(),
+            apy: apy_usdt_borrow,
+            accrued: '22',
+        }];
 
         set({ myBorrows });
 
@@ -489,11 +501,11 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const maxRepayUsdt = Math.abs(Number(assetBalanceUsdt) / BALANCE_DECIMAL); //+t need to add
         const maxRepayTon = Math.abs(Number(assetBalanceTon) / COUNT_DECIMAL); //+t need to add
         set({ maxRepay: { [Token.TON]: maxRepayTon, [Token.USDT]: maxRepayUsdt } });
-        
-        
+
+
         const max_ton_supply = Number(get().tonBalance);
         const max_usdt_supply = Number(get().usdtBalance);
-        set({maxSupply: { [Token.TON]: max_ton_supply, [Token.USDT]: max_usdt_supply} })
+        set({ maxSupply: { [Token.TON]: max_ton_supply, [Token.USDT]: max_usdt_supply } })
     }
 
     setInterval(updateData, 30000);
@@ -514,7 +526,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
         myBorrows: [],
         supplies: [],
         borrows: [],
-        apyBorrow:{},
+        apyBorrow: {},
         apySupply: {},
         tonBalance: '0',
         usdtBalance: '0',

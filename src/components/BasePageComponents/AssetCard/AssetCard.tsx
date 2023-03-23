@@ -1,7 +1,4 @@
-import React from 'react';
 import { AssetCardLogo, AssetCardText, AssetCardTextSimple, AssetCardWrapper, AssetWrapper, DoubleTextLower, DoubleTextUpper, DoubleTextWrapper } from './AssetCardStyles';
-import TONLogo from '../../../assets/pictures/ton_asset.png';
-import USDTLogo from '../../../assets/pictures/usdt_asset.png';
 import { AssetCardButton } from '../../Buttons/Buttons';
 import { Token } from '../../../store/prices';
 import { usePrices, TokenMap } from '../../../store/prices';
@@ -28,7 +25,7 @@ export const SupplyAssetCard = ({ onClick, token, balance, apy } : AssetCardProp
             </AssetWrapper>
             <AssetCardText right={45.5}>{balance} {TokenMap[token].ticker}</AssetCardText>
             <AssetCardText right={30.1}>{formatPercent(apy)}</AssetCardText>
-            <AssetCardButton disabled={Number(balance) === 0} onClick={onClick} right={0}>Supply</AssetCardButton>
+            <AssetCardButton disabled={TokenMap[token].ticker === 'TOS'}  onClick={onClick} right={0}>Supply</AssetCardButton>
         </AssetCardWrapper>
     )
 }
@@ -50,7 +47,7 @@ export const MySuppliesAssetCard = ({ onClick, token, balance, apy, earned } : A
                 <DoubleTextUpper>{(parseFloat(apy.toString()).toFixed(2))} %</DoubleTextUpper>
                 {/* <DoubleTextLower>{earned} {TokenMap[token].ticker}</DoubleTextLower> */}
             </DoubleTextWrapper>
-            <AssetCardButton disabled={Number(balance) === 0} onClick={onClick} right={0}>Withdraw</AssetCardButton>
+            <AssetCardButton onClick={onClick} right={0}>Withdraw</AssetCardButton>
         </AssetCardWrapper>
     )
 }
@@ -64,7 +61,7 @@ export const BorrowAssetCard = ({ onClick, token, liquidity, apy} : AssetCardPro
             </AssetWrapper>
             <AssetCardText right={43.5}>{liquidity}</AssetCardText>
             <AssetCardText right={30.1}>{formatPercent(apy)}</AssetCardText>
-            <AssetCardButton disabled={Number(liquidity) === 0 && apy === 0} onClick={onClick} right={0}>Borrow</AssetCardButton>
+            <AssetCardButton disabled={TokenMap[token].ticker === 'TOS'} onClick={onClick} right={0}>Borrow</AssetCardButton>
         </AssetCardWrapper>
     )
 }
@@ -85,7 +82,8 @@ export const MyBorrowsAssetCard = ({ onClick, token, balance, apy, accrued} : As
                 <DoubleTextUpper>{formatPercent(Number((parseFloat(apy.toString())).toFixed(4)))}</DoubleTextUpper>
                 {/* <DoubleTextLower>{accrued} {TokenMap[token].ticker}</DoubleTextLower> */}
             </DoubleTextWrapper>
-            <AssetCardButton disabled={Number(balance) === 0} onClick={onClick} right={0}>Repay</AssetCardButton>
+            {/* disabled={Number(balance) === 0} */}
+            <AssetCardButton  onClick={onClick} right={0}>Repay</AssetCardButton>
         </AssetCardWrapper>
     )
 }
