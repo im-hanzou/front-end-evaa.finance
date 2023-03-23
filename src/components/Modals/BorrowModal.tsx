@@ -128,7 +128,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
     const { t, i18n } = useTranslation();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
     const { formatToUsd } = usePrices();
-    const { maxBorrow, apy_usdt_borrow, apy_ton_borrow } = useBalance();
+    const { maxBorrow, apyBorrow} = useBalance();
 
     const currentToken = borrow?.token || Token.TON;
     const { ticker, tokenId } = TokenMap[currentToken];
@@ -142,12 +142,8 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
         const reciver = window.mastersc
         sendTransaction(reciver.toString(), tokenAmount, tokenId, action)
     }
-    let apy_borrow;
-    if (currentToken == Token.TON){
-        apy_borrow = apy_ton_borrow;
-    }else{
-       apy_borrow = apy_usdt_borrow;
-    }
+    const isMoreMax = Number(tokenAmount) > (maxBorrow || 0);
+
 
     return (
         <Dialog.Panel as={DialogStyled}>
@@ -155,7 +151,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
             <Title>Borrow {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' max={maxBorrow} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(watch("price"), currentToken)}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -175,11 +171,11 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper> */}
                     <InfoTextWrapper>
                         <InfoText>APY (Interest)</InfoText>
-                        <InfoTextBlue>{formatPercent(apy_borrow)}</InfoTextBlue>
+                        <InfoTextBlue>{formatPercent(apyBorrow[currentToken] || 0)}</InfoTextBlue>
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn onClick={() => click()}>Borrow</ModalBtn>
+            <ModalBtn disabled={isMoreMax} onClick={() => click()}>Borrow</ModalBtn>
         </Dialog.Panel>
     )
 }

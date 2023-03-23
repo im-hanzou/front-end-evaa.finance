@@ -103,8 +103,9 @@ interface BalanceStore {
     maxWithdraw: {
         [key in Token]?: number
     };
-    max_ton_supply: number;
-    max_usdt_supply: number;
+    maxSupply: {
+        [key in Token]?: number
+    }
     maxBorrow: number;
     maxRepay: {
         [key in Token]?: number
@@ -116,10 +117,12 @@ interface BalanceStore {
     tonBalance: string;
     usdtBalance: string;
     userAddress?: Address;
-    apy_usdt_borrow: number;
-    apy_ton_borrow: number;
-    apy_ton_supply: number;
-    apy_usdt_supply: number;
+    apyBorrow:{
+        [key in Token]?: number
+    }
+    apySupply:{
+        [key in Token]?: number
+    }
     forceUpdateData: () => void;
 }
 
@@ -383,9 +386,8 @@ export const useBalance = create<BalanceStore>((set, get) => {
          argsUserAvl.writeNumber(10);
 
          const apy_usdt_supply = Number((((Number(ratesPerSecondDataUsdt.s_rate_per_second) * 360 * 24 + 1) ^ 365 - 1) / SEC_DECIMAL).toFixed(3));
-         set({apy_usdt_supply});
          const apy_ton_supply = Number((((Number(ratesPerSecondDataTon.s_rate_per_second) * 360 * 24 + 1) ^ 365 - 1) / VALUE_DECIMAL).toFixed(2));
-         set({ apy_ton_supply });
+         set({apySupply:{ [Token.TON]: apy_ton_supply, [Token.USDT]: apy_usdt_supply }})
  
 
          const supplies = [{
@@ -405,10 +407,10 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
         const apy_usdt_borrow_math = Number(ratesPerSecondDataUsdt.b_rate_per_second) / SEC_DECIMAL;
         const apy_usdt_borrow = ((apy_usdt_borrow_math * 360 * 24 + 1) ^ 365 - 1) / 10000;
-        set({ apy_usdt_borrow });
         const apy_ton_borrow_math = Number(ratesPerSecondDataTon.b_rate_per_second) / VALUE_DECIMAL;
         const apy_ton_borrow = Number((((apy_ton_borrow_math * 360 * 24 + 1) ^ 365 - 1) / 10000000).toFixed(4));
-        set({ apy_ton_borrow })
+        set({apyBorrow: { [Token.TON]: apy_ton_borrow, [Token.USDT]: apy_usdt_borrow }})        
+        
 
         const liquidity_usdt = (Math.abs(Number(assetBalanceUsdt) - Number(assetReserveUsdt)) / BALANCE_DECIMAL).toFixed(2);
         const liquidity_ton = (Math.abs(Number(assetBalanceTon) - Number(assetReserveTon)) / BALANCE_DECIMAL / 1000).toFixed(2);
@@ -479,21 +481,19 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
         const maxWithdrawUsdt = Math.abs(Number(assetBalanceUsdt) / BALANCE_DECIMAL);
         const maxWithdrawTon = Math.abs(Number(assetBalanceTon) / COUNT_DECIMAL);
-
         set({ maxWithdraw: { [Token.TON]: maxWithdrawTon, [Token.USDT]: maxWithdrawUsdt } });
 
         const maxBorrow = Math.abs(Number(availableToBorrowData) / Number(data.price));
-
         set({ maxBorrow });
 
         const maxRepayUsdt = Math.abs(Number(assetBalanceUsdt) / BALANCE_DECIMAL); //+t need to add
         const maxRepayTon = Math.abs(Number(assetBalanceTon) / COUNT_DECIMAL); //+t need to add
         set({ maxRepay: { [Token.TON]: maxRepayTon, [Token.USDT]: maxRepayUsdt } });
-
+        
+        
         const max_ton_supply = Number(get().tonBalance);
-        set({ max_ton_supply })
         const max_usdt_supply = Number(get().usdtBalance);
-        set({ max_usdt_supply })
+        set({maxSupply: { [Token.TON]: max_ton_supply, [Token.USDT]: max_usdt_supply} })
     }
 
     setInterval(updateData, 30000);
@@ -506,19 +506,16 @@ export const useBalance = create<BalanceStore>((set, get) => {
         borrowLimitValue: 0,
         availableToBorrow: '0',
         liquidityValue: {},
-        max_ton_supply: 200,
-        max_usdt_supply: 200,
         maxWithdraw: {},
+        maxSupply: {},
         maxBorrow: 0,
         maxRepay: {},
         mySupplies: [],
         myBorrows: [],
         supplies: [],
         borrows: [],
-        apy_ton_borrow: 0,
-        apy_usdt_borrow: 0,
-        apy_ton_supply: 0,
-        apy_usdt_supply: 0,
+        apyBorrow:{},
+        apySupply: {},
         tonBalance: '0',
         usdtBalance: '0',
         forceUpdateData: updateData,

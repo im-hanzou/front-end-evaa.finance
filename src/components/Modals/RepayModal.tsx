@@ -136,7 +136,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
 
     const { sendTransaction } = useWallet();
 
-    const tokenAmount = watch("price")
+    const tokenAmount = watch("price");
     const click = () => {
         const action = 'repay'
         // @ts-ignore
@@ -144,13 +144,15 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
         sendTransaction(reciver.toString(), tokenAmount, tokenId, action)
     }
 
+    const isMoreMax = Number(tokenAmount) > (maxRepay[currentToken] || 0);
+
     return (
         <Dialog.Panel as={DialogStyled}>
             <CloseButton onClick={close} />
             <Title>Repay {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' max={maxRepay[currentToken]} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(watch("price"), currentToken)}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -170,7 +172,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn onClick={click}>Repay</ModalBtn>
+            <ModalBtn disabled={isMoreMax} onClick={click}>Repay</ModalBtn>
         </Dialog.Panel>
     )
 }

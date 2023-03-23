@@ -124,29 +124,23 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
     const { t, i18n } = useTranslation();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
     const { formatToUsd } = usePrices();
-    const { max_ton_supply, max_usdt_supply, apy_ton_supply, apy_usdt_supply } = useBalance();
+    const { apySupply, maxSupply} = useBalance();
 
     const currentToken = supply?.token || Token.TON;
     const {ticker, tokenId} = TokenMap[currentToken];
 
     const { sendTransaction } = useWallet();
 
-    const tokenAmount = watch("price")
+    const tokenAmount = watch("price");
     const click = () => {
         const action = 'supply'
         // @ts-ignore
         const reciver = window.mastersc
         sendTransaction(reciver.toString(), tokenAmount, tokenId, action)
     }
-    let maxSupply;
-    let apySupply;
-    if (currentToken == Token.TON){
-        maxSupply = max_ton_supply;
-        apySupply = apy_ton_supply;
-    }else{
-        maxSupply = max_usdt_supply;
-        apySupply = apy_usdt_supply;
-    }
+    const isMoreMax = Number(tokenAmount) > (maxSupply[currentToken] || 0);
+
+    // let maxSupply;
 
     return (
         <Dialog.Panel as={DialogStyled}>
@@ -154,7 +148,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
             <Title>Supply {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' max={maxSupply[currentToken]} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(watch("price"), currentToken)}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -162,15 +156,15 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{maxSupply} {ticker}</InfoText>
+                        <InfoText>{maxSupply[currentToken]} {ticker}</InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Supply APY</InfoText>
-                        <InfoText>{apySupply} %</InfoText>
+                        <InfoText>{apySupply[currentToken]} %</InfoText>
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn onClick={click}>Supply</ModalBtn>
+            <ModalBtn disabled={isMoreMax} onClick={click}>Supply</ModalBtn>
         </Dialog.Panel>
     )
 }
