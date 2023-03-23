@@ -44,4 +44,8 @@ export const AssetCardButton = styled.button<{ left?: number, right?: number,  f
     font-size: 1.8rem;
     font-weight: 700;
     color: #fff;
+
+    &:disabled{
+        background-color: grey;
+    }
 `
