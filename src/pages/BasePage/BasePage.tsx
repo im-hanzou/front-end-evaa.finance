@@ -1,5 +1,5 @@
 import Header from '../../components/Header/Header';
-import { BasePageContainer, ContentWrapper } from './BasePageStyles';
+import { BasePageContainer, ContentWrapper, MobileInfo, MobileWrapper, TestnetInfo, TestnetMinor } from './BasePageStyles';
 import InfoBar from '../../components/BasePageComponents/InfoBar/InfoBar';
 import Supplies from './Assets/Supplies';
 import Borrows from './Assets/Borrows';
@@ -8,6 +8,7 @@ import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 import styled from 'styled-components';
 import { useState } from 'react';
+import { BoldRobotoText } from '../../components/Texts/MainTexts';
 
 
 const StyledTabs = styled(Tabs)`
@@ -46,22 +47,31 @@ const items: TabsProps['items'] = [
 
 
 const BasePage = () => {
-
   const [ tab, setTab ] = useState('1');
+  const isMobile = window.innerWidth < 480;
 
-
+  if(isMobile){
     return (
-        <BasePageContainer>
-            <Header />
-            <InfoBar />
-            <StyledTabs defaultActiveKey="1" items={items} onChange={setTab} />
-            <ContentWrapper>
-                <Supplies tab={tab}/>
-                <Borrows tab={tab}/>
-            </ContentWrapper>
-            <Footer />
-        </BasePageContainer>
+      <MobileWrapper>
+        <Header />
+        <MobileInfo>Open From Desktop. Mobile is not supported at the moment</MobileInfo>
+      </MobileWrapper>
     )
+  }
+
+  return (
+    <BasePageContainer>
+        <TestnetInfo>TEST NET. <TestnetMinor>Switch your wallet to testnet to use</TestnetMinor></TestnetInfo>
+        <Header />
+        <InfoBar />
+        <StyledTabs defaultActiveKey="1" items={items} onChange={setTab} />
+        <ContentWrapper>
+            <Supplies tab={tab}/>
+            <Borrows tab={tab}/>
+        </ContentWrapper>
+        <Footer />
+    </BasePageContainer>
+  )
 }
 
 export default BasePage;
