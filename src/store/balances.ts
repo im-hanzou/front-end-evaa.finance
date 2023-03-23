@@ -174,9 +174,12 @@ export const useBalance = create<BalanceStore>((set, get) => {
         }, stack.readCellOpt());
 
         let data = dict.get(bufferToBigInt((await usdt).hash));
-        console.log(data.price);
-        data = dict.get(bufferToBigInt(ton.hash));
-        console.log(data.price);
+        const assetBalanceUsdt = dict.get(bufferToBigInt((await usdt).hash)).balance;
+        // data = dict.get(bufferToBigInt(ton.hash));
+        const assetBalanceTon = dict.get(bufferToBigInt((await ton).hash)).balance;
+        // console.log(data.balance);
+
+
         console.log('2-----------POOL METADATA----');
 
         //@ts-ignore
@@ -262,7 +265,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
         argsUser.writeNumber(data.s_rate) //s_rate todo change on actual srate
         argsUser.writeNumber(data.b_rate)//b_rate todo
 
-        let assetBalanceUsdt = BigInt(0);
+        // let assetBalanceUsdt = BigInt(0);
 
         try {
             const accountAssetBalanceUsdt = await toncenter.runMethod(
@@ -271,7 +274,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 argsUser.build(),
             );
 
-            assetBalanceUsdt = BigInt(accountAssetBalanceUsdt.stack.readNumber());
+            // assetBalanceUsdt = BigInt(accountAssetBalanceUsdt.stack.readNumber());
         } catch (e) {
             console.log('error with getAccountAssetBalance', e)
         }
@@ -282,7 +285,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
         argsUser2.writeNumber(data.s_rate) //s_rate todo change on actual srate
         argsUser2.writeNumber(data.b_rate)//b_rate todo
 
-        let assetBalanceTon = BigInt(0);
+        // let assetBalanceTon = BigInt(0);
 
         try {
             const accountAssetBalanceTon = await toncenter.runMethod(
@@ -291,7 +294,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 argsUser2.build(),
             );
 
-            assetBalanceTon = BigInt(accountAssetBalanceTon.stack.readNumber());
+            // assetBalanceTon = BigInt(accountAssetBalanceTon.stack.readNumber());
         } catch (e) {
             console.log('error with getAccountAssetBalance', e)
         }
