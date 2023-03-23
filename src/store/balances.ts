@@ -124,6 +124,7 @@ interface BalanceStore {
         [key in Token]?: number
     }
     forceUpdateData: () => void;
+    isInitedUser: boolean;
 }
 
 export const useBalance = create<BalanceStore>((set, get) => {
@@ -378,7 +379,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
             );
             aggregatedBalance1 = getAggregatedBalances.stack.readNumber();// agregatedbalances 
             aggregatedBalance2 = getAggregatedBalances.stack.readNumber();// agregatedbalances   
-            console.log(aggregatedBalance1, aggregatedBalance2);
+            set({isInitedUser: true});
         } catch (e) {
             console.log('error with getAggregatedBalances', e)
         }
@@ -479,7 +480,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
             earned: '13',
         };
 
-        const mySupplies = [newMySupply];
+        const mySupplies = get().isInitedUser ? [newMySupply] : [];
         set({ mySupplies });
 
 
@@ -491,7 +492,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
             accrued: '22',
         }];
 
-        set({ myBorrows });
+        set({ myBorrows: get().isInitedUser ? myBorrows : []});
 
 
         const maxWithdrawUsdt = Math.abs(Number(assetBalanceUsdt) / BALANCE_DECIMAL);
@@ -534,5 +535,6 @@ export const useBalance = create<BalanceStore>((set, get) => {
         tonBalance: '0',
         usdtBalance: '0',
         forceUpdateData: updateData,
+        isInitedUser: false,
     }
 });
