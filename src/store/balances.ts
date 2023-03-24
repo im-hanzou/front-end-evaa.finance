@@ -42,6 +42,7 @@ export const masterContractAddress = Address.parse(masterAdd);
 window.mastersc = masterContractAddress
 export const oracleMasterSourceV1CodeCell = Cell.fromBoc(Buffer.from(userSCData.hex, 'hex'))[0];
 const masterContractCode = oracleMasterSourceV1CodeCell;
+
 const RATE_DECIMAL = Math.pow(10, 18);
 const VALUE_DECIMAL = Math.pow(10, 9);
 const BALANCE_DECIMAL = Math.pow(10, 6);
@@ -178,7 +179,6 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const usdtData = dict.get(bufferToBigInt((await usdt).hash)).balance;
         const tonData = dict.get(bufferToBigInt((await ton).hash)).balance;
         const assetBalanceUsdt = dict.get(bufferToBigInt((await usdt).hash)).balance;
-        // data = dict.get(bufferToBigInt(ton.hash));
         const assetBalanceTon = dict.get(bufferToBigInt((await ton).hash)).balance;
         // console.log(data.balance);
 
@@ -494,22 +494,23 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const mySupplies = get().isInitedUser ? newMySupply.filter(e => e) : [];
         //@ts-ignore
         set({ mySupplies });
-
-
+    
         const myBorrows = [
-            accountAssetBalanceUsdtData < 0 ? {
+            accountAssetBalanceUsdtData > 0 ? {
                 id: 'firs12122t',
                 token: Token.USDT,
                 balance: Math.abs(Number(parseFloat((Number(accountAssetBalanceUsdtData) / BALANCE_DECIMAL).toString()).toFixed(2))).toString(),
                 apy: apy_usdt_borrow,
                 accrued: '22',
-            } : null, accountAssetBalanceTonData < 0 ? {
+            } : null, accountAssetBalanceTonData > 0 ? {
                 id: 'fasdfirs12122t',
                 token: Token.TON,
                 balance: parseFloat((Number(accountAssetBalanceTonData) / VALUE_DECIMAL).toString()).toFixed(2),
                 apy: apy_ton_borrow,
                 accrued: '10',
             } : null];
+
+            
 
         //@ts-ignore
         set({ myBorrows: get().isInitedUser ? myBorrows.filter(e => e) : [] });
