@@ -229,9 +229,10 @@ export const useWallet = create<AuthStore>((set, get) => {
       });
 
       if (tx.boc) {
-        alert('tx done')
+        alert('Transaction is done');
+        location.reload();
       } else {
-        alert('something went wrong')
+        alert('Something went wrong')
       }
     },
 

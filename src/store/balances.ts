@@ -200,9 +200,9 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 buidler.storeSlice(src);
             },
             parse: (src: Slice) => {
-                const oracle = src.loadAddress();             //store_slice(oracle)
+                const oracle = src.loadAddress();                     //store_slice(oracle)
                 const decimals = BigInt(src.loadUint(8));             //.store_uint(decimals, 8)
-                const ref = src.loadRef().beginParse();       //.store_ref(begin_cell()
+                const ref = src.loadRef().beginParse();               //.store_ref(begin_cell()
                 const collateralFactor = BigInt(ref.loadUint(16));    //.store_uint(collateral_factor, 16) 
                 const liquidationThreshold = BigInt(ref.loadUint(16));//.store_uint(liquidation_threshold, 16) 
                 const liquidationPenalty = BigInt(ref.loadUint(16));  // .store_uint(liquidation_penalty, 16)
@@ -224,8 +224,11 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
         // get asset config by address -------
         console.log(dictConf.get(bufferToBigInt((await usdt).hash)))
+        
         console.log('4-----------IS POOL ACTIVE?----')
         console.log(confItems.loadInt(8) === -1) //if pool active = -1 (true) / 0 (false)
+
+        
         console.log('5----SRATE BRATE PER SEC BY ASSET----')
 
         const dictRates = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), {
@@ -475,7 +478,6 @@ export const useBalance = create<BalanceStore>((set, get) => {
         }
 
 
-
         const newMySupply = [
             accountAssetBalanceTonData > 0 ? {
                 id: 'fir12312321st',
@@ -495,6 +497,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
         //@ts-ignore
         set({ mySupplies });
     
+
         const myBorrows = [
             accountAssetBalanceUsdtData < 0 ? {
                 id: 'firs12122t',
@@ -509,6 +512,8 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 apy: apy_ton_borrow,
                 accrued: '10',
             } : null];
+            console.log(accountAssetBalanceTonData + "  akskska");
+            
 
             
 
@@ -523,8 +528,8 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const maxBorrow = Math.abs(Number(availableToBorrowData) / Number(data.price));
         set({ maxBorrow });
 
-        const maxRepayUsdt = Math.abs(Number(assetBalanceUsdt) / BALANCE_DECIMAL); //+t need to add
-        const maxRepayTon = Math.abs(Number(assetBalanceTon) / COUNT_DECIMAL); //+t need to add
+        const maxRepayUsdt = Number(Number(get().usdtBalance).toFixed(2)); //+t need to add
+        const maxRepayTon = Number(Number(get().tonBalance).toFixed(2)); //+t need to add
         set({ maxRepay: { [Token.TON]: maxRepayTon, [Token.USDT]: maxRepayUsdt } });
 
 
