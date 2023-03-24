@@ -212,7 +212,7 @@ export const useWallet = create<AuthStore>((set, get) => {
             .storeUint(60, 32)
             .storeUint(0, 64)
             .storeUint(assetAddress, 256)
-            .storeUint(toNano(amount), 64)
+            .storeUint(BigInt(Number(amount) * (1000000) + ''), 64)
             .endCell()
 
           messages.push({

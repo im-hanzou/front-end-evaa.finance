@@ -390,10 +390,11 @@ export const useBalance = create<BalanceStore>((set, get) => {
         argsUserAvl.writeCell(asdf_config);
         argsUserAvl.writeAddress(await usdt);
         argsUserAvl.writeNumber(10);
-
+        console.log(ratesPerSecondDataUsdt.s_rate_per_second)
+        console.log(ratesPerSecondDataTon.s_rate_per_second)
         const apy_usdt_supply = Number((Math.pow(Number(ratesPerSecondDataUsdt.s_rate_per_second / BigInt(RATE_DECIMAL) * BigInt(360) * BigInt(24) + BigInt(1)), 365) - 1).toFixed(2));
         const apy_ton_supply = Number((Math.pow(Number(ratesPerSecondDataTon.s_rate_per_second / BigInt(RATE_DECIMAL) * BigInt(360) * BigInt(24) + BigInt(1)), 365) - 1).toFixed(2));
-        set({ apySupply: { [Token.TON]: Number(apy_ton_supply), [Token.USDT]: apy_usdt_supply } })
+        set({ apySupply: { [Token.TON]: Number(apy_ton_supply), [Token.USDT]: Number(apy_usdt_supply) } })
 
         const supplies = [{
             id: 'dkdskasdk',
