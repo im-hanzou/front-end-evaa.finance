@@ -175,6 +175,8 @@ export const useBalance = create<BalanceStore>((set, get) => {
         }, stack.readCellOpt());
 
         let data = dict.get(bufferToBigInt((await usdt).hash));
+        const usdtData = dict.get(bufferToBigInt((await usdt).hash)).balance;
+        const tonData = dict.get(bufferToBigInt((await ton).hash)).balance;
         const assetBalanceUsdt = dict.get(bufferToBigInt((await usdt).hash)).balance;
         // data = dict.get(bufferToBigInt(ton.hash));
         const assetBalanceTon = dict.get(bufferToBigInt((await ton).hash)).balance;
@@ -379,7 +381,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
             );
             aggregatedBalance1 = getAggregatedBalances.stack.readNumber();// agregatedbalances 
             aggregatedBalance2 = getAggregatedBalances.stack.readNumber();// agregatedbalances   
-            set({isInitedUser: true});
+            set({ isInitedUser: true });
         } catch (e) {
             console.log('error with getAggregatedBalances', e)
         }
@@ -390,10 +392,8 @@ export const useBalance = create<BalanceStore>((set, get) => {
         argsUserAvl.writeNumber(10);
 
         const apy_usdt_supply = Number((Math.pow(Number(ratesPerSecondDataUsdt.s_rate_per_second / BigInt(RATE_DECIMAL) * BigInt(360) * BigInt(24) + BigInt(1)), 365) - 1).toFixed(2));
-        const apy_ton_supply = Number((Math.pow(Number(ratesPerSecondDataUsdt.s_rate_per_second / BigInt(RATE_DECIMAL) * BigInt(360) * BigInt(24) + BigInt(1)), 365) - 1).toFixed(2));
+        const apy_ton_supply = Number((Math.pow(Number(ratesPerSecondDataTon.s_rate_per_second / BigInt(RATE_DECIMAL) * BigInt(360) * BigInt(24) + BigInt(1)), 365) - 1).toFixed(2));
         set({ apySupply: { [Token.TON]: Number(apy_ton_supply), [Token.USDT]: apy_usdt_supply } })
-        
-
 
         const supplies = [{
             id: 'dkdskasdk',
@@ -473,27 +473,45 @@ export const useBalance = create<BalanceStore>((set, get) => {
             set({ borrowLimitPercent });
         }
 
-        const newMySupply = {
-            id: 'fir12312321st',
-            token: Token.TON,
-            balance: parseFloat((Number(accountAssetBalanceTonData) / VALUE_DECIMAL).toString()).toFixed(2),
-            apy: apy_ton_supply,
-            earned: '13',
-        };
 
-        const mySupplies = get().isInitedUser ? [newMySupply] : [];
+
+        const newMySupply = [
+            accountAssetBalanceTonData > 0 ? {
+                id: 'fir12312321st',
+                token: Token.TON,
+                balance: parseFloat((Number(accountAssetBalanceTonData) / VALUE_DECIMAL).toString()).toFixed(2),
+                apy: apy_ton_supply,
+                earned: '13',
+            } : null, accountAssetBalanceUsdtData > 0 ? {
+                id: 'fiasdflllr12312321st',
+                token: Token.USDT,
+                balance: Math.abs(Number(parseFloat((Number(accountAssetBalanceUsdtData) / BALANCE_DECIMAL).toString()).toFixed(2))).toString(),
+                apy: apy_usdt_supply,
+                earned: '14',
+            } : null];
+
+        const mySupplies = get().isInitedUser ? newMySupply.filter(e => e) : [];
+        //@ts-ignore
         set({ mySupplies });
 
 
-        const myBorrows = [{
-            id: 'firs12122t',
-            token: Token.USDT,
-            balance: Math.abs(Number(parseFloat((Number(accountAssetBalanceUsdtData) / BALANCE_DECIMAL).toString()).toFixed(2))).toString(),
-            apy: apy_usdt_borrow,
-            accrued: '22',
-        }];
+        const myBorrows = [
+            accountAssetBalanceUsdtData < 0 ? {
+                id: 'firs12122t',
+                token: Token.USDT,
+                balance: Math.abs(Number(parseFloat((Number(accountAssetBalanceUsdtData) / BALANCE_DECIMAL).toString()).toFixed(2))).toString(),
+                apy: apy_usdt_borrow,
+                accrued: '22',
+            } : null, accountAssetBalanceTonData < 0 ? {
+                id: 'fasdfirs12122t',
+                token: Token.TON,
+                balance: parseFloat((Number(accountAssetBalanceTonData) / VALUE_DECIMAL).toString()).toFixed(2),
+                apy: apy_ton_borrow,
+                accrued: '10',
+            } : null];
 
-        set({ myBorrows: get().isInitedUser ? myBorrows : []});
+        //@ts-ignore
+        set({ myBorrows: get().isInitedUser ? myBorrows.filter(e => e) : [] });
 
 
         const maxWithdrawUsdt = Math.abs(Number(assetBalanceUsdt) / BALANCE_DECIMAL);
