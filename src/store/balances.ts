@@ -480,13 +480,13 @@ export const useBalance = create<BalanceStore>((set, get) => {
             accountAssetBalanceTonData > 0 ? {
                 id: 'fir12312321st',
                 token: Token.TON,
-                balance: parseFloat((Number(accountAssetBalanceTonData) / VALUE_DECIMAL).toString()).toFixed(2),
+                balance: Number(accountAssetBalanceTonData / BigInt(VALUE_DECIMAL)).toFixed(2),
                 apy: apy_ton_supply,
                 earned: '13',
             } : null, accountAssetBalanceUsdtData > 0 ? {
                 id: 'fiasdflllr12312321st',
                 token: Token.USDT,
-                balance: Number(parseFloat((Number(accountAssetBalanceUsdtData) / BALANCE_DECIMAL).toString()).toFixed(2)).toString(),
+                balance: Number(accountAssetBalanceUsdtData / BigInt(BALANCE_DECIMAL)).toFixed(2),
                 apy: apy_usdt_supply,
                 earned: '14',
             } : null];
@@ -499,13 +499,13 @@ export const useBalance = create<BalanceStore>((set, get) => {
             accountAssetBalanceUsdtData < 0 ? {
                 id: 'firs12122t',
                 token: Token.USDT,
-                balance: Math.abs(Number(Number(accountAssetBalanceUsdtData) / BALANCE_DECIMAL)).toFixed(2),
+                balance: Math.abs(Number(accountAssetBalanceUsdtData / BigInt(BALANCE_DECIMAL))).toFixed(2),
                 apy: apy_usdt_borrow,
                 accrued: '22',
             } : null, accountAssetBalanceTonData < 0 ? {
                 id: 'fasdfirs12122t',
                 token: Token.TON,
-                balance: Math.abs(Number(accountAssetBalanceTonData) / VALUE_DECIMAL).toFixed(2),
+                balance: Math.abs(Number(accountAssetBalanceTonData / BigInt(VALUE_DECIMAL))).toFixed(2),
                 apy: apy_ton_borrow,
                 accrued: '10',
             } : null];
