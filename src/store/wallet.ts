@@ -7,11 +7,9 @@ import { MASTER_EVAA_ADDRESS, USDT_EVAA_ADDRESS } from '@/config';
 import { isMobile, openLink, addReturnStrategy } from '@/utils';
 import { bufferToBigInt, friendlifyUserAddress } from '@/ton/utils';
 import { tonClient } from '@/ton/client';
-
-import { useBalance } from './balances';
 import { Minter } from '@/ton/minter';
-import { getTokenAddress } from '@/ton/getTokenAddress';
-import { Token } from './prices';
+
+import { Token, useTokens } from './tokens';
 
 const dappMetadata = { manifestUrl: 'https://raw.githubusercontent.com/evaafi/front-end/dev/getConfig.json' };
 
@@ -32,31 +30,15 @@ interface AuthStore {
 }
 
 export const useWallet = create<AuthStore>((set, get) => {
-
   const connector = new TonConnect(dappMetadata);
 
   connector.onStatusChange((async (wallet) => {
-    const userAddress = friendlifyUserAddress(wallet?.account.address);
-    const tonBalance = fromNano(await tonClient.getBalance(Address.parse(connector?.wallet?.account.address as string)));
+    const userFriendlyAddress = friendlifyUserAddress(wallet?.account.address);
+    const userAddress = Address.parse(wallet?.account.address as string);
+  
+    set(() => ({ wallet, userAddress: userFriendlyAddress, universalLink: '' }));
 
-    const contract = new Minter(USDT_EVAA_ADDRESS);
-    const juserwalletEvaaMasterSC = await tonClient.open(contract).getWalletAddress(Address.parseRaw(wallet?.account.address as string))
-    const contract1 = new Minter(Address.parseFriendly(juserwalletEvaaMasterSC.toString()).address);
-
-    let usdtBalance = 0;
-
-    try {
-      const juserwalletEvaaMasterSC1 = await tonClient.open(contract1).getBalance()
-      usdtBalance = juserwalletEvaaMasterSC1.readNumber() / 1000000;
-    } catch (e) {
-      console.log('error with get usdtBalance', e)
-    }
-
-    set(() => ({ wallet, userAddress, universalLink: '' }));
-
-    useBalance.setState({ usdtBalance: String(usdtBalance), tonBalance, userAddress: Address.parseRaw(wallet?.account.address as string) });
-    useBalance.getState().forceUpdateData();
-
+    useTokens.getState().initTokens(userAddress);
   }), console.error);
 
   connector.restoreConnection().then(() => {
@@ -110,8 +92,8 @@ export const useWallet = create<AuthStore>((set, get) => {
     },
 
     sendTransaction: async (address: string, amount: string, tokenId: string, action: string) => {
-      const usdtAddress = await getTokenAddress(Token.USDT);
-      const tonAddress = await getTokenAddress(Token.TON);
+      const usdtAddress = useTokens.getState().tokens[Token.USDT]?.address;
+      const tonAddress = useTokens.getState().tokens[Token.TON]?.address;
       
       const body = beginCell()
         .endCell()
@@ -121,7 +103,7 @@ export const useWallet = create<AuthStore>((set, get) => {
       if (tokenId === 'ton') {
         if (action === 'supply' || action === 'repay') {
           const body = beginCell()
-            .endCell()
+            .endCell();
           messages.push({
             address,
             amount: toNano(amount).toString(),
@@ -189,7 +171,6 @@ export const useWallet = create<AuthStore>((set, get) => {
           })
         }
       }
-      console.log(messages)
       const tx = await connector.sendTransaction({
         validUntil: (new Date()).getTime() / 1000 + 5 * 1000 * 60,
         messages

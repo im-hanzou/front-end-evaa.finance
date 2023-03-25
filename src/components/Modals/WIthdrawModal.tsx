@@ -5,13 +5,13 @@ import styled from "styled-components";
 import { XMarkIcon } from '@heroicons/react/20/solid'
 
 import { MASTER_EVAA_ADDRESS } from "@/config";
+import { useWallet } from '@/store/wallet';
+import { Token, useTokens, TokenMap } from "@/store/tokens";
+import { MySupply, useBalance } from '@/store/balance';
 
-import { useWallet } from '../../store/wallet';
 import { BlueButton } from "../Buttons/Buttons";
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 import { AmountInDollars } from "./SupplyModal";
-import { Token, usePrices, TokenMap } from "../../store/prices";
-import { MySupply, useBalance } from '../../store/balances';
 
 const DialogStyled = styled(Dialog.Panel)`
     position: relative;
@@ -114,7 +114,7 @@ interface FormData {
 export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
     const { t, i18n } = useTranslation();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
-    const { formatToUsd } = usePrices();
+    const { formatToUsd } = useTokens();
 
     const currentToken = supply?.token || Token.TON;
     const { tokenId, ticker } = TokenMap[currentToken];
@@ -136,7 +136,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
                 <MyStyledInput type='number' max={supply?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
-                {watch("price") && <AmountInDollars>{formatToUsd(watch("price"), currentToken)}</AmountInDollars>}
+                {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
                 <Subtitle>Transaction Overview</Subtitle>

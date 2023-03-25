@@ -1,10 +1,8 @@
 import { AssetCardLogo, AssetCardText, AssetCardTextSimple, AssetCardWrapper, AssetWrapper, DoubleTextLower, DoubleTextUpper, DoubleTextWrapper } from './AssetCardStyles';
 import { AssetCardButton } from '../../Buttons/Buttons';
-import { Token } from '../../../store/prices';
-import { usePrices, TokenMap } from '../../../store/prices';
-import { useBalance } from '../../../store/balances';
-import { formatPercent } from '../../../utils';
 
+import { Token, useTokens, TokenMap } from '@/store/tokens';
+import { formatPercent } from '@/utils';
 
 export interface AssetCardProps {
     token: Token;
@@ -31,7 +29,7 @@ export const SupplyAssetCard = ({ onClick, token, balance, apy } : AssetCardProp
 }
 
 export const MySuppliesAssetCard = ({ onClick, token, balance, apy, earned } : AssetCardProps) => {    
-    const {formatToUsd} = usePrices();
+    const {formatToUsd} = useTokens();
     
     return (
         <AssetCardWrapper>
@@ -41,7 +39,7 @@ export const MySuppliesAssetCard = ({ onClick, token, balance, apy, earned } : A
             </AssetWrapper>
             <DoubleTextWrapper right={42.5}>
                 <DoubleTextUpper>{balance} {TokenMap[token].ticker}</DoubleTextUpper>
-                <DoubleTextLower>{formatToUsd(balance, token)}</DoubleTextLower>
+                <DoubleTextLower>{formatToUsd(token, balance)}</DoubleTextLower>
             </DoubleTextWrapper>
             <DoubleTextWrapper right={30.1}>
                 <DoubleTextUpper>{(parseFloat(apy.toString()).toFixed(2))} %</DoubleTextUpper>
@@ -67,7 +65,7 @@ export const BorrowAssetCard = ({ onClick, token, liquidity, apy} : AssetCardPro
 }
 
 export const MyBorrowsAssetCard = ({ onClick, token, balance, apy, accrued} : AssetCardProps) => {    
-    const {formatToUsd} = usePrices();
+    const {formatToUsd} = useTokens();
     return (
         <AssetCardWrapper>
             <AssetWrapper>
@@ -76,7 +74,7 @@ export const MyBorrowsAssetCard = ({ onClick, token, balance, apy, accrued} : As
             </AssetWrapper>
             <DoubleTextWrapper right={42.5}>
                 <DoubleTextUpper>{balance} {TokenMap[token].ticker}</DoubleTextUpper>
-                <DoubleTextLower>{formatToUsd(balance, token)}</DoubleTextLower>
+                <DoubleTextLower>{formatToUsd(token, balance)}</DoubleTextLower>
             </DoubleTextWrapper>
             <DoubleTextWrapper right={30.1}>
                 <DoubleTextUpper>{formatPercent(Number((parseFloat(apy.toString())).toFixed(4)))}</DoubleTextUpper>

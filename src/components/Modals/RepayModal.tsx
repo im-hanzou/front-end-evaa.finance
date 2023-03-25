@@ -6,15 +6,15 @@ import { XMarkIcon } from '@heroicons/react/20/solid'
 import { ArrowLongRightIcon } from '@heroicons/react/20/solid'
 
 import { MASTER_EVAA_ADDRESS } from '@/config';
-import { formatPercent } from "@/utils";
+import { formatPercent, formatUsd } from "@/utils";
+import { Token, TokenMap, useTokens } from "@/store/tokens";
+import { useWallet } from '@/store/wallet';
+import { MyBorrow, useBalance } from "@/store/balance";
 
 import { AmountInDollars } from "./SupplyModal";
-import { Token, TokenMap, usePrices } from "../../store/prices";
-import { MyBorrow, useBalance } from "../../store/balances";
 import { BlueButton } from "../Buttons/Buttons";
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 
-import { useWallet } from '../../store/wallet';
 
 const DialogStyled = styled(Dialog.Panel)`
     position: relative;
@@ -129,10 +129,10 @@ interface FormData {
 }
 
 export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
-    const { maxRepay, borrowLimitPercent, borrowBalance, availableToBorrow } = useBalance();
+    const { borrowLimitPercent, borrowBalance, availableToBorrow } = useBalance();
     const { t, i18n } = useTranslation();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
-    const { formatToUsd } = usePrices();
+    const { formatToUsd } = useTokens();
 
     const currentToken = borrow?.token || Token.TON;
     const {ticker, tokenId} = TokenMap[currentToken];
@@ -145,7 +145,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
         sendTransaction(MASTER_EVAA_ADDRESS.toString(), tokenAmount, tokenId, action)
     }
 
-    const isMoreMax = Number(tokenAmount) > (maxRepay[currentToken] || 0);
+    const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
 
     return (
         <Dialog.Panel as={DialogStyled}>
@@ -153,15 +153,15 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
             <Title>Repay {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' max={maxRepay[currentToken]} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
-                {watch("price") && <AmountInDollars>{formatToUsd(watch("price"), currentToken)}</AmountInDollars>}
+                <MyStyledInput type='number' max={borrow?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
                 <Subtitle>Transaction Overview</Subtitle>
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{maxRepay[currentToken]} {ticker}</InfoText>
+                        <InfoText>{borrow?.max} {ticker}</InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>
@@ -169,7 +169,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Balance</InfoText>
-                        <InfoText>{formatToUsd(Number(borrowBalance).toFixed(2))} {<ArrowRight />} {formatToUsd(availableToBorrow)}</InfoText>
+                        <InfoText>{formatUsd(Number(borrowBalance).toFixed(2))} {<ArrowRight />} {formatUsd(availableToBorrow)}</InfoText>
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>

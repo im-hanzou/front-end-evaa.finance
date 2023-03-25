@@ -1,17 +1,16 @@
+import { useBalance } from '@/store/balance';
+import { formatPercent, formatUsd } from '@/utils';
+
 import { BoldRobotoText, MediumRobotoText } from '../../Texts/MainTexts';
 import { APYWrapper, APYWrapperSubtitle, APYWrapperTitle, BorrowLine, BorrowLineBack, BorrowLineFront, BorrowLineSubtitle, BorrowLineWrapper, InfoBarWrapper, MoneyInfoWrapper, MoneyWrapper, WhiteSpan, WhiteSpanTwo } from './InfoBarStyled';
-import { useBalance } from '../../../store/balances';
-import { usePrices, Token } from '../../../store/prices';
-import { formatPercent } from '../../../utils';
 
 export interface InfoBarProps { }
 
 
 const InfoBar = ({} : InfoBarProps) => { 
-    const { borrowBalance, supplyBalance, borrowLimitPercent, borrowLimitValue, availableToBorrow } = useBalance();
-    const { formatToUsd } = usePrices();
-    const [borrowBalanceInt, borrowBalanceFraction] = formatToUsd(borrowBalance).split(".");
-    const [supplyBalanceInt, supplyBalanceFraction] = formatToUsd(supplyBalance).split(".");
+    const { borrowBalance, supplyBalance, borrowLimitPercent, borrowLimitValue } = useBalance();
+    const [borrowBalanceInt, borrowBalanceFraction] = formatUsd(borrowBalance).split(".");
+    const [supplyBalanceInt, supplyBalanceFraction] = formatUsd(supplyBalance).split(".");
     
     return (
         <InfoBarWrapper>
@@ -35,7 +34,7 @@ const InfoBar = ({} : InfoBarProps) => {
                     <BorrowLineBack/>
                     <BorrowLineFront borrowLimit={borrowLimitPercent * 100}/>
                 </BorrowLine>
-                <BorrowLineSubtitle>{formatToUsd(borrowLimitValue.toString())}</BorrowLineSubtitle>
+                <BorrowLineSubtitle>{formatUsd(borrowLimitValue.toString())}</BorrowLineSubtitle>
             </BorrowLineWrapper>
         </InfoBarWrapper>
     )

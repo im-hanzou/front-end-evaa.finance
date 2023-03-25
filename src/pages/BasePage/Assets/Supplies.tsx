@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Dialog } from '@headlessui/react';
+
+import { useBalance, MySupply, Supply } from '@/store/balance';
+import { useWallet } from '@/store/wallet';
+
 import { MySuppliesAssetCard, SupplyAssetCard } from '../../../components/BasePageComponents/AssetCard/AssetCard';
 import { MySuppliesDescriptionBar, SupplyDescriptionBar } from '../../../components/BasePageComponents/AssetsDescriptionBar/AssetsDescriptionBar';
 import { SupplyModal } from '../../../components/Modals/SupplyModal';
 import { AssetsSubWrapper, AssetsSubtitle, AssetsTitle, AssetsWrapper } from './AssetsStyles';
 import { WithdrawModal } from '../../../components/Modals/WIthdrawModal';
-import { useBalance, MySupply, Supply } from '../../../store/balances';
-import { useWallet } from '../../../store/wallet';
 
 
 export interface SuppliesProps { 

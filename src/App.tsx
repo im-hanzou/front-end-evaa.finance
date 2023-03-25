@@ -9,14 +9,18 @@ import {
 import AuthRoute from './components/AuthRoute/AuthRoute';
 import routes from './routes';
 import { useWallet } from './store/wallet';
+import { useTokens } from './store/tokens';
+import { useBalance } from './store/balance';
 
 
 export interface AppProps { }
 
 const App: React.FunctionComponent<AppProps> = props => {
     const { isLoading } = useWallet();
+    const { isLoading: isTokensLoading } = useTokens();
+    const { isLoading: isBalanceLoading } = useBalance();
 
-    if (isLoading) {
+    if (isLoading || isTokensLoading || isBalanceLoading) {
         return <LoadingComponent />;
     }
 

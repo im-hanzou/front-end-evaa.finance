@@ -16,6 +16,11 @@ export function addReturnStrategy(url: string, returnStrategy: 'back' | 'none'):
 	return link.toString();
 }
 
-export function formatPercent(value: number) {
+export function formatPercent(value: number = 0) {
 	return `${(value * 100).toFixed(2)} %`
+}
+
+export function formatUsd(value: string | number) {
+	const usd = Number(value);
+	return `$${usd.toFixed(2)}`
 }

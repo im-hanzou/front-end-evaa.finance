@@ -7,12 +7,12 @@ import { ArrowLongRightIcon } from '@heroicons/react/20/solid'
 
 import { MASTER_EVAA_ADDRESS } from '@/config';
 import { formatPercent } from '@/utils';
+import { useTokens, Token, TokenMap } from "@/store/tokens";
+import { Borrow, useBalance } from "@/store/balance";
+import { useWallet } from '@/store/wallet';
 
 import { BlueButton } from "../Buttons/Buttons";
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
-import { usePrices, Token, TokenMap } from "../../store/prices";
-import { Borrow, useBalance } from "../../store/balances";
-import { useWallet } from '../../store/wallet';
 
 import { AmountInDollars } from "./SupplyModal";
 
@@ -131,8 +131,7 @@ interface FormData {
 export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
     const { t, i18n } = useTranslation();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
-    const { formatToUsd } = usePrices();
-    const { maxBorrow, apyBorrow} = useBalance();
+    const { formatToUsd } = useTokens();
 
     const currentToken = borrow?.token || Token.TON;
     const { ticker, tokenId } = TokenMap[currentToken];
@@ -144,7 +143,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
         const action = 'borrow'
         sendTransaction(MASTER_EVAA_ADDRESS.toString(), tokenAmount, tokenId, action)
     }
-    const isMoreMax = Number(tokenAmount) > (maxBorrow || 0);
+    const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
 
 
     return (
@@ -153,15 +152,15 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
             <Title>Borrow {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' max={maxBorrow[currentToken]} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
-                {watch("price") && <AmountInDollars>{formatToUsd(watch("price"), currentToken)}</AmountInDollars>}
+                <MyStyledInput type='number' max={borrow?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
                 <Subtitle>Transaction Overview</Subtitle>
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{maxBorrow[currentToken]} {ticker}</InfoText>
+                        <InfoText>{borrow?.max} {ticker}</InfoText>
                     </InfoTextWrapper>
                     {/* <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>
@@ -173,7 +172,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper> */}
                     <InfoTextWrapper>
                         <InfoText>APY (Interest)</InfoText>
-                        <InfoTextBlue>{formatPercent(apyBorrow[currentToken] || 0)}</InfoTextBlue>
+                        <InfoTextBlue>{formatPercent(borrow?.apy)}</InfoTextBlue>
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>

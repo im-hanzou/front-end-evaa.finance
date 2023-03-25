@@ -8,8 +8,8 @@ import { MASTER_EVAA_ADDRESS } from '@/config';
 
 import { BlueButton } from "../Buttons/Buttons";
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
-import { Token, TokenMap, usePrices } from "../../store/prices";
-import { Supply, useBalance} from "../../store/balances";
+import { Token, TokenMap, useTokens } from "../../store/tokens";
+import { Supply } from "@/store/balance";
 import { useWallet } from '../../store/wallet';
 import { formatPercent } from "@/utils";
 
@@ -126,7 +126,7 @@ interface FormData {
 export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
     const { t, i18n } = useTranslation();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
-    const { formatToUsd } = usePrices();
+    const { formatToUsd } = useTokens();
 
     const currentToken = supply?.token || Token.TON;
     const {ticker, tokenId} = TokenMap[currentToken];
@@ -138,6 +138,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
         const action = 'supply'
         sendTransaction(MASTER_EVAA_ADDRESS.toString(), tokenAmount, tokenId, action)
     }
+    
     const isMoreMax = Number(tokenAmount) > (supply?.max || 0);
 
     return (
@@ -146,8 +147,8 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
             <Title>Supply {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' max={supply?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
-                {watch("price") && <AmountInDollars>{formatToUsd(watch("price"), currentToken)}</AmountInDollars>}
+                <MyStyledInput type='number' max={supply?.max} maxLength={7} {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
                 <Subtitle>Transaction Overview</Subtitle>

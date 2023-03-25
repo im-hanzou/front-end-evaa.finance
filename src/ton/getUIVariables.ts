@@ -115,15 +115,13 @@ export async function getUIVariables() {
     }, stack.readCellOpt())
 
     const output = {
-        dictReserves: dictReserves,
-        dictRates: dictRates,
-        isPoolActive: isPoolActive,
-        assetConfigDict: assetConfigDict,
-        assetDataDict: assetDataDict,
-        metadata: metadata,
+        dictReserves,
+        dictRates,
+        isPoolActive,
+        assetConfigDict,
+        assetDataDict,
+        metadata,
     }
-
-    console.info('output', output);
 
     return output;
 }

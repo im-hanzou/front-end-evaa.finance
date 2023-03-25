@@ -1,13 +1,14 @@
 import { useState } from 'react';
+import { Dialog } from '@headlessui/react';
+
+import { useBalance, Borrow, MyBorrow } from '@/store/balance';
+import { useWallet } from '@/store/wallet';
+
 import { BorrowAssetCard, MyBorrowsAssetCard } from '../../../components/BasePageComponents/AssetCard/AssetCard';
 import { AssetsSubtitle, AssetsSubWrapper, AssetsTitle, AssetsWrapper } from './AssetsStyles';
 import { BorrowDescriptionBar, MyBorrowsDescriptionBar } from '../../../components/BasePageComponents/AssetsDescriptionBar/AssetsDescriptionBar';
 import { BorrowModal } from '../../../components/Modals/BorrowModal';
-import { Dialog } from '@headlessui/react';
 import { RepayModal } from '../../../components/Modals/RepayModal';
-import { useBalance, Borrow, MyBorrow } from '../../../store/balances';
-import { useWallet } from '../../../store/wallet';
-
 
 export interface BorrowsProps { 
     tab: string;
