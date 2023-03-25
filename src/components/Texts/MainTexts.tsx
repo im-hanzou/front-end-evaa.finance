@@ -5,14 +5,14 @@ interface TextProps {
     color?: string
 } 
 
-export const RegularRobotoText = styled.h1<TextProps>`
+export const RegularRobotoText = styled.span<TextProps>`
         font-family: "Inter", sans-serif;
         font-weight: 400;
         color: ${props => props.color ? props.color : "#FFF"};
         font-size: ${props => props.fontSize ? props.fontSize : 2.2}rem;
 `
 
-export const MediumRobotoText = styled.h1<TextProps>`
+export const MediumRobotoText = styled.span<TextProps>`
         font-family: "Inter", sans-serif;
         font-weight: 500;
         color: ${props => props.color ? props.color : "#FFF"};

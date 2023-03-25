@@ -2,13 +2,16 @@ import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { XMarkIcon } from '@heroicons/react/20/solid'
+
+import { MASTER_EVAA_ADDRESS } from '@/config';
+
 import { BlueButton } from "../Buttons/Buttons";
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
-import { XMarkIcon } from '@heroicons/react/20/solid'
 import { Token, TokenMap, usePrices } from "../../store/prices";
 import { Supply, useBalance} from "../../store/balances";
-
 import { useWallet } from '../../store/wallet';
+import { formatPercent } from "@/utils";
 
 const DialogStyled = styled(Dialog.Panel)`
     position: relative;
@@ -124,7 +127,6 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
     const { t, i18n } = useTranslation();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
     const { formatToUsd } = usePrices();
-    const { apySupply, maxSupply} = useBalance();
 
     const currentToken = supply?.token || Token.TON;
     const {ticker, tokenId} = TokenMap[currentToken];
@@ -134,13 +136,9 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
     const tokenAmount = watch("price");
     const click = () => {
         const action = 'supply'
-        // @ts-ignore
-        const reciver = window.mastersc
-        sendTransaction(reciver.toString(), tokenAmount, tokenId, action)
+        sendTransaction(MASTER_EVAA_ADDRESS.toString(), tokenAmount, tokenId, action)
     }
-    const isMoreMax = Number(tokenAmount) > (maxSupply[currentToken] || 0);
-
-    // let maxSupply;
+    const isMoreMax = Number(tokenAmount) > (supply?.max || 0);
 
     return (
         <Dialog.Panel as={DialogStyled}>
@@ -148,7 +146,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
             <Title>Supply {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' max={maxSupply[currentToken]} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' max={supply?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(watch("price"), currentToken)}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -156,11 +154,11 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{maxSupply[currentToken]} {ticker}</InfoText>
+                        <InfoText>{supply?.max} {ticker}</InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Supply APY</InfoText>
-                        <InfoText>{apySupply[currentToken]} %</InfoText>
+                        <InfoText>{formatPercent(supply?.apy || 0)}</InfoText>
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>

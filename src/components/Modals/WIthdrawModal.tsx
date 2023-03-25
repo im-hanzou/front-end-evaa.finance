@@ -2,14 +2,16 @@ import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { XMarkIcon } from '@heroicons/react/20/solid'
+
+import { MASTER_EVAA_ADDRESS } from "@/config";
+
+import { useWallet } from '../../store/wallet';
 import { BlueButton } from "../Buttons/Buttons";
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
-import { XMarkIcon } from '@heroicons/react/20/solid'
 import { AmountInDollars } from "./SupplyModal";
 import { Token, usePrices, TokenMap } from "../../store/prices";
 import { MySupply, useBalance } from '../../store/balances';
-
-import { useWallet } from '../../store/wallet';
 
 const DialogStyled = styled(Dialog.Panel)`
     position: relative;
@@ -110,8 +112,6 @@ interface FormData {
 }
 
 export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
-    const { maxWithdraw } = useBalance();
-
     const { t, i18n } = useTranslation();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
     const { formatToUsd } = usePrices();
@@ -123,13 +123,11 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
 
     const tokenAmount = watch("price");
     const click = () => {
-        const action = 'withdraw'
-        // @ts-ignore
-        const reciver = window.mastersc
-        sendTransaction(reciver.toString(), tokenAmount, tokenId, action)
+        const action = 'withdraw';
+        sendTransaction(MASTER_EVAA_ADDRESS.toString(), tokenAmount, tokenId, action)
     }
 
-    const isMoreMax = Number(tokenAmount) > (maxWithdraw[currentToken] || 0);
+    const isMoreMax = Number(tokenAmount) > (supply?.max || 0);
 
     return (
         <Dialog.Panel as={DialogStyled}>
@@ -137,7 +135,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
             <Title>Withdraw {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' max={maxWithdraw[currentToken]} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' max={supply?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(watch("price"), currentToken)}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -145,7 +143,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{maxWithdraw[currentToken]} {ticker}</InfoText>
+                        <InfoText>{supply?.max} {ticker}</InfoText>
                     </InfoTextWrapper>
                     {/* <InfoTextWrapper>
                             <InfoText>Supply APY</InfoText>

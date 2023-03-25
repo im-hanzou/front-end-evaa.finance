@@ -1,7 +1,12 @@
-import IRoute from "./interfaces/route";
 import BasePage from "./pages/BasePage/BasePage";
 
-// pages
+interface IRoute {
+    path: string;
+    name: string;
+    auth: boolean;
+    component: any;
+    props?: any;
+}
 
 const mainRoutes: IRoute[] = [
     {

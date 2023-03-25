@@ -2,15 +2,19 @@ import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { BlueButton } from "../Buttons/Buttons";
-import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 import { XMarkIcon } from '@heroicons/react/20/solid'
 import { ArrowLongRightIcon } from '@heroicons/react/20/solid'
-import { AmountInDollars } from "./SupplyModal";
+
+import { MASTER_EVAA_ADDRESS } from '@/config';
+import { formatPercent } from '@/utils';
+
+import { BlueButton } from "../Buttons/Buttons";
+import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 import { usePrices, Token, TokenMap } from "../../store/prices";
 import { Borrow, useBalance } from "../../store/balances";
-import { formatPercent } from '../../utils';
 import { useWallet } from '../../store/wallet';
+
+import { AmountInDollars } from "./SupplyModal";
 
 const DialogStyled = styled(Dialog.Panel)`
     position: relative;
@@ -138,9 +142,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
     const tokenAmount = watch("price")
     const click = () => {
         const action = 'borrow'
-        // @ts-ignore
-        const reciver = window.mastersc
-        sendTransaction(reciver.toString(), tokenAmount, tokenId, action)
+        sendTransaction(MASTER_EVAA_ADDRESS.toString(), tokenAmount, tokenId, action)
     }
     const isMoreMax = Number(tokenAmount) > (maxBorrow || 0);
 
@@ -151,7 +153,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
             <Title>Borrow {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' max={maxBorrow} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' max={maxBorrow[currentToken]} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(watch("price"), currentToken)}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -159,7 +161,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{maxBorrow} {ticker}</InfoText>
+                        <InfoText>{maxBorrow[currentToken]} {ticker}</InfoText>
                     </InfoTextWrapper>
                     {/* <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>

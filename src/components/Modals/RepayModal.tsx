@@ -2,16 +2,19 @@ import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { BlueButton } from "../Buttons/Buttons";
-import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 import { XMarkIcon } from '@heroicons/react/20/solid'
 import { ArrowLongRightIcon } from '@heroicons/react/20/solid'
+
+import { MASTER_EVAA_ADDRESS } from '@/config';
+import { formatPercent } from "@/utils";
+
 import { AmountInDollars } from "./SupplyModal";
 import { Token, TokenMap, usePrices } from "../../store/prices";
 import { MyBorrow, useBalance } from "../../store/balances";
+import { BlueButton } from "../Buttons/Buttons";
+import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 
 import { useWallet } from '../../store/wallet';
-import { formatPercent } from "../../utils";
 
 const DialogStyled = styled(Dialog.Panel)`
     position: relative;
@@ -139,9 +142,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
     const tokenAmount = watch("price");
     const click = () => {
         const action = 'repay'
-        // @ts-ignore
-        const reciver = window.mastersc
-        sendTransaction(reciver.toString(), tokenAmount, tokenId, action)
+        sendTransaction(MASTER_EVAA_ADDRESS.toString(), tokenAmount, tokenId, action)
     }
 
     const isMoreMax = Number(tokenAmount) > (maxRepay[currentToken] || 0);
@@ -164,11 +165,11 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>
-                        <InfoText>{borrowLimitPercent * 100} {<ArrowRight />} {formatPercent(Number(parseFloat(borrowLimitPercent.toString()).toFixed(2)))}</InfoText>
+                        <InfoText>{formatPercent(Number((borrowLimitPercent).toFixed(2)))} {<ArrowRight />} 100 %</InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Balance</InfoText>
-                        <InfoText>{formatToUsd(borrowBalance)} {<ArrowRight />} {formatToUsd(availableToBorrow)}</InfoText>
+                        <InfoText>{formatToUsd(Number(borrowBalance).toFixed(2))} {<ArrowRight />} {formatToUsd(availableToBorrow)}</InfoText>
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
