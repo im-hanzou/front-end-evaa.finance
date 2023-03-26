@@ -12,6 +12,7 @@ interface ModalConfirmButtonProps {
 export const StyledButton = styled(Button)`
     line-height: 1.8rem;
     background-color: #0381C5;
+    height: 5.5rem;
 
     & span {
         font-size: 1.8rem;

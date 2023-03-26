@@ -127,7 +127,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
             notification.open({
                 message: 'Withdraw is successful',
                 description: 'The transaction will take some time to process, please do not worry',
-                icon: <RocketLaunchIcon color='#0381C5' width='5rem' height='5rem' />,
+                icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
             });
 
             useBalance.getState().initBalance();
@@ -138,7 +138,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
             notification.open({
                 message: 'Transaction not completed',
                 description: 'The transaction was canceled by the user or another error occurred, try again',
-                icon: <ExclamationCircleIcon color='red' width='5rem' height='5rem' />,
+                icon: <ExclamationCircleIcon color='red' width='32px' height='32px' />,
             }); 
         }
     }
