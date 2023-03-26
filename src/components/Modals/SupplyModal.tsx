@@ -2,16 +2,16 @@ import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { XMarkIcon, ExclamationCircleIcon, RocketLaunchIcon } from '@heroicons/react/20/solid';
+import { notification } from 'antd';
 
-import { MASTER_EVAA_ADDRESS } from '@/config';
-
-import { BlueButton } from "../Buttons/Buttons";
-import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
-import { Token, TokenMap, useTokens } from "../../store/tokens";
-import { Supply } from "@/store/balance";
-import { useWallet } from '../../store/wallet';
+import { Token, TokenMap, useTokens } from "@/store/tokens";
+import { Supply, useBalance } from "@/store/balance";
+import { useWallet, Action } from '@/store/wallet';
 import { formatPercent } from "@/utils";
+
+import ModalConfirmButton from "../ModalConfirmButton";
+import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 
 const DialogStyled = styled(Dialog.Panel)`
     position: relative;
@@ -81,7 +81,7 @@ const InfoTextWrapper = styled.div`
     /* margin-bottom: 1rem; */
 `
 
-const ModalBtn = styled(BlueButton)`
+const ModalBtn = styled(ModalConfirmButton)`
     position: absolute; 
     bottom: 3.5rem;
     width: 41.7rem;
@@ -129,16 +129,34 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
     const { formatToUsd } = useTokens();
 
     const currentToken = supply?.token || Token.TON;
-    const {ticker, tokenId} = TokenMap[currentToken];
+    const { ticker } = TokenMap[currentToken];
 
-    const { sendTransaction } = useWallet();
+    const { sendTransaction, isWaitingResponse } = useWallet();
 
     const tokenAmount = watch("price");
-    const click = () => {
-        const action = 'supply'
-        sendTransaction(MASTER_EVAA_ADDRESS.toString(), tokenAmount, tokenId, action)
+    const click = async () => {
+        try {
+            await sendTransaction(tokenAmount, currentToken, Action.supply);
+            
+            notification.open({
+                message: 'Supply is successful',
+                description: 'The transaction will take some time to process, please do not worry',
+                icon: <RocketLaunchIcon color='#0381C5' width='5rem' height='5rem' />,
+            });
+
+            useBalance.getState().initBalance();
+
+            close();
+
+        } catch {
+            notification.open({
+                message: 'Transaction not completed',
+                description: 'The transaction was canceled by the user or another error occurred, try again',
+                icon: <ExclamationCircleIcon color='red' width='5rem' height='5rem' />,
+            }); 
+        }
     }
-    
+
     const isMoreMax = Number(tokenAmount) > (supply?.max || 0);
 
     return (
@@ -147,7 +165,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
             <Title>Supply {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' max={supply?.max} maxLength={7} {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' step='any' max={supply?.max} maxLength={7} {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -163,7 +181,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn disabled={isMoreMax} onClick={click}>Supply</ModalBtn>
+            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount} onClick={click}>Supply</ModalBtn>
         </Dialog.Panel>
     )
 }

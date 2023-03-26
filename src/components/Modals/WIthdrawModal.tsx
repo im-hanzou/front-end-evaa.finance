@@ -1,15 +1,14 @@
 import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { XMarkIcon, ExclamationCircleIcon, RocketLaunchIcon } from '@heroicons/react/20/solid';
+import { notification } from 'antd';
 
-import { MASTER_EVAA_ADDRESS } from "@/config";
-import { useWallet } from '@/store/wallet';
+import { useWallet, Action } from '@/store/wallet';
 import { Token, useTokens, TokenMap } from "@/store/tokens";
 import { MySupply, useBalance } from '@/store/balance';
 
-import { BlueButton } from "../Buttons/Buttons";
+import ModalConfirmButton from "../ModalConfirmButton";
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 import { AmountInDollars } from "./SupplyModal";
 
@@ -71,7 +70,7 @@ const InfoTextWrapper = styled.div`
     /* margin-bottom: 1rem; */
 `
 
-const ModalBtn = styled(BlueButton)`
+const ModalBtn = styled(ModalConfirmButton)`
     position: absolute; 
     bottom: 3.5rem;
     width: 41.7rem;
@@ -112,19 +111,36 @@ interface FormData {
 }
 
 export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
-    const { t, i18n } = useTranslation();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
     const { formatToUsd } = useTokens();
 
     const currentToken = supply?.token || Token.TON;
-    const { tokenId, ticker } = TokenMap[currentToken];
+    const { ticker } = TokenMap[currentToken];
 
-    const { sendTransaction } = useWallet();
+    const { sendTransaction, isWaitingResponse } = useWallet();
 
     const tokenAmount = watch("price");
-    const click = () => {
-        const action = 'withdraw';
-        sendTransaction(MASTER_EVAA_ADDRESS.toString(), tokenAmount, tokenId, action)
+    const click = async () => {
+        try {
+            await sendTransaction(tokenAmount, currentToken, Action.withdraw);
+            
+            notification.open({
+                message: 'Withdraw is successful',
+                description: 'The transaction will take some time to process, please do not worry',
+                icon: <RocketLaunchIcon color='#0381C5' width='5rem' height='5rem' />,
+            });
+
+            useBalance.getState().initBalance();
+
+            close();
+
+        } catch {
+            notification.open({
+                message: 'Transaction not completed',
+                description: 'The transaction was canceled by the user or another error occurred, try again',
+                icon: <ExclamationCircleIcon color='red' width='5rem' height='5rem' />,
+            }); 
+        }
     }
 
     const isMoreMax = Number(tokenAmount) > (supply?.max || 0);
@@ -135,7 +151,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
             <Title>Withdraw {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' max={supply?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' step='any' max={supply?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -151,7 +167,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
                         </InfoTextWrapper> */}
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn disabled={isMoreMax} onClick={click}>Withdraw</ModalBtn>
+            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount} onClick={click}>Withdraw</ModalBtn>
         </Dialog.Panel>
     )
 }

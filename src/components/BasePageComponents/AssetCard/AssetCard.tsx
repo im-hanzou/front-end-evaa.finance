@@ -1,5 +1,5 @@
 import { AssetCardLogo, AssetCardText, AssetCardTextSimple, AssetCardWrapper, AssetWrapper, DoubleTextLower, DoubleTextUpper, DoubleTextWrapper } from './AssetCardStyles';
-import { AssetCardButton } from '../../Buttons/Buttons';
+import { AssetCardButton } from '../../AssetCardButton';
 
 import { Token, useTokens, TokenMap } from '@/store/tokens';
 import { formatPercent } from '@/utils';

@@ -2,13 +2,22 @@ import { Dialog } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 import QRCode from "react-qr-code";
 import styled from "styled-components";
-import { GrayBtn } from "../Buttons/Buttons";
+
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 
 interface QRModalProps {
 	close: () => void;
     link: string;
 }
+
+const GrayBtn = styled.button`
+    background: #F2F2F2;
+    border: 1px solid #F2F2F2;
+    border-radius: 10px;
+    font-size: 2rem;
+    font-weight: 700;
+    padding: 1rem 2rem;
+`
 
 const DialogStyled = styled(Dialog.Panel)`
     padding: 4rem 5rem;

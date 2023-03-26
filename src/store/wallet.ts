@@ -9,12 +9,20 @@ import { bufferToBigInt, friendlifyUserAddress } from '@/ton/utils';
 import { tonClient } from '@/ton/client';
 import { Minter } from '@/ton/minter';
 
-import { Token, useTokens } from './tokens';
+import { Token, TokenMap, useTokens } from './tokens';
 
 const dappMetadata = { manifestUrl: 'https://raw.githubusercontent.com/evaafi/front-end/dev/getConfig.json' };
 
+export enum Action {
+  supply,
+  repay,
+  withdraw,
+  borrow
+}
+
 interface AuthStore {
   isLoading: boolean;
+  isWaitingResponse: boolean;
   universalLink: string;
   userAddress: string;
 
@@ -24,7 +32,7 @@ interface AuthStore {
   logout: () => void;
   callIfLoged: <T>(callback: (...args: T[]) => void) => ((...args: T[]) => void);
   login: () => void;
-  sendTransaction: (address: string, amount: string, tokenId: string, action: string) => void;
+  sendTransaction: (amount: string, token: Token, action: Action) => void;
 
   resetUniversalLink: () => void;
 }
@@ -47,6 +55,7 @@ export const useWallet = create<AuthStore>((set, get) => {
 
   return {
     isLoading: true,
+    isWaitingResponse: false,
     universalLink: '',
     userAddress: friendlifyUserAddress(connector?.wallet?.account.address),
     connector,
@@ -91,63 +100,54 @@ export const useWallet = create<AuthStore>((set, get) => {
 
     },
 
-    sendTransaction: async (address: string, amount: string, tokenId: string, action: string) => {
-      const usdtAddress = useTokens.getState().tokens[Token.USDT]?.address;
-      const tonAddress = useTokens.getState().tokens[Token.TON]?.address;
-      
-      const body = beginCell()
-        .endCell()
+    sendTransaction: async (amount: string, token: Token, action: Action) => {
+      const hashKey = useTokens.getState().tokens[token]?.hashKey as bigint;
+      const jettonAddress = useTokens.getState().tokens[token]?.address as Address;
+      const nanoAmount =  BigInt(Number(amount) * TokenMap[token].decimal);
 
-      let messages = []
+      const address = MASTER_EVAA_ADDRESS.toString();
 
-      if (tokenId === 'ton') {
-        if (action === 'supply' || action === 'repay') {
-          const body = beginCell()
-            .endCell();
+      let messages = [];
+
+      if (action === Action.withdraw || action === Action.borrow) {
+        const body = beginCell()
+          .storeUint(60, 32)
+          .storeUint(0, 64)
+          .storeUint(hashKey, 256)
+          .storeUint(nanoAmount, 64)
+          .endCell()
+
+        messages.push({
+          address,
+          amount: toNano('0.1').toString(),
+          payload: body.toBoc().toString('base64'),
+        });
+      }
+
+      if (action === Action.supply || action === Action.repay) {
+        if (token === Token.TON) {
+          const body = beginCell().endCell();
+
           messages.push({
             address,
-            amount: toNano(amount).toString(),
+            amount: nanoAmount.toString(),
             payload: body.toBoc().toString('base64'),
           })
-        } else if (action === 'withdraw' || action === 'borrow') {
-          const assetAddress = bufferToBigInt(tonAddress?.hash) // todo change address
-
-          const body = beginCell()
-            .storeUint(60, 32)
-            .storeUint(0, 64)
-            .storeUint(assetAddress, 256)
-            .storeUint(toNano(amount), 64)
-            .endCell()
-
-          messages.push({
-            address: MASTER_EVAA_ADDRESS,
-            amount: toNano('0.1').toString(),
-            payload: body.toBoc().toString('base64'),
-          })
-        }
-      } else if (tokenId === 'usdt') {
-        if (action === 'supply' || action === 'repay') {
-          const contract = new Minter(USDT_EVAA_ADDRESS);
-          const juserwalletEvaaMasterSC = await tonClient.open(contract).getWalletAddress(Address.parseFriendly(address).address)
+        } else {
+          // API for rest jettons should be same
           const body = beginCell()
             .storeUint(0xf8a7ea5, 32)
             .storeUint(0, 64)
-            // @ts-ignore
-            .storeCoins(new BN(Number(amount) * (1000000) + ''))
+            .storeCoins(nanoAmount)
             .storeAddress(MASTER_EVAA_ADDRESS)
             .storeAddress(null) //responce add?
             .storeDict(null)
             .storeCoins(toNano('0.1'))
             .storeMaybeRef(null) //tons to be forwarded
             .endCell()
-          const juserwallet = await tonClient.open(contract).getWalletAddress(Address.parse(connector?.wallet?.account.address as string))
-          console.log(juserwallet.toString({
-            urlSafe: true,
-            bounceable: false,
-            testOnly: true
-          }))
+
           messages.push({
-            address: juserwallet.toString({
+            address: jettonAddress.toString({
               urlSafe: true,
               bounceable: false,
               testOnly: true
@@ -155,32 +155,23 @@ export const useWallet = create<AuthStore>((set, get) => {
             amount: toNano('0.2').toString(),
             payload: body.toBoc().toString('base64'),
           })
-        } else if (action === 'withdraw' || action === 'borrow') {
-          const assetAddress = bufferToBigInt(usdtAddress?.hash) // todo change address
-          const body = beginCell()
-            .storeUint(60, 32)
-            .storeUint(0, 64)
-            .storeUint(assetAddress, 256)
-            .storeUint(BigInt(Number(amount) * (1000000) + ''), 64)
-            .endCell()
-
-          messages.push({
-            address,
-            amount: toNano('0.1').toString(),
-            payload: body.toBoc().toString('base64'),
-          })
         }
       }
-      const tx = await connector.sendTransaction({
-        validUntil: (new Date()).getTime() / 1000 + 5 * 1000 * 60,
-        messages
-      });
 
-      if (tx.boc) {
-        alert('Transaction is done');
-        location.reload();
-      } else {
-        alert('Something went wrong')
+      set({ isWaitingResponse: true });
+
+      try {
+        await connector.sendTransaction({
+          validUntil: (new Date()).getTime() / 1000 + 5 * 1000 * 60,
+          messages
+        });
+        
+        set({ isWaitingResponse: false });
+
+      } catch(e) {
+        set({ isWaitingResponse: false });
+
+        throw(e);
       }
     },
 

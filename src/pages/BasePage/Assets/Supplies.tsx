@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Dialog } from '@headlessui/react';
+import { notification } from 'antd';
 
 import { useBalance, MySupply, Supply } from '@/store/balance';
 import { useWallet } from '@/store/wallet';
@@ -17,14 +18,13 @@ export interface SuppliesProps {
 
 
 const Supplies = ({ tab }: SuppliesProps) => {
+    const [api, contextHolder] = notification.useNotification();
     const { callIfLoged: callIfLogin } = useWallet();
     const { mySupplies, supplies } = useBalance();
     const [selectedMySupply, setSelectedMySupply] = useState<MySupply | undefined>();
     const [selectedSupply, setSelectedSupply] = useState<Supply | undefined>();
     const currentMySupplies = tab === '1' ? mySupplies : [];
     const currentSupplies = tab === '1' ? supplies : [];
-    
-
 
     return (
         <>
