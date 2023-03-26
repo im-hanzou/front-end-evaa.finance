@@ -132,8 +132,8 @@ export const useBalance = create<BalanceStore>((set, get) => {
             const assetReserve = dictReserves.get(tokenData.hashKey)?.reserve;
 
             const apyBorrow = ratesPerSecond ? calcApy({ rate: ratesPerSecond.b_rate_per_second }) : 0;
-            const maxBorrow = Math.abs(Number(availableToBorrowData) / Number(assetTokenData?.price));
             const liquidity = (Math.abs(Number(assetTokenData?.balance) - Number(assetReserve)) / token.decimal).toFixed(2);
+            const maxBorrow = Math.min(Number(liquidity), Math.abs(Number(availableToBorrowData) / Number(assetTokenData?.price)));
 
             if (assetReserve) {
                 borrows.push({
@@ -147,14 +147,15 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             if (isInitedUser) {
                 // mySupplies
-                const maxWithdraw = Math.abs(Number(assetTokenData?.balance) / token.decimal);
-
+                
                 const accountAssetBalance = await getAccountAssetBalance({
                     userContractAddress,
                     address: tokenData.address,
                     s_rate: assetTokenData?.s_rate,
                     b_rate: assetTokenData?.b_rate
                 });
+
+                const maxWithdraw = Math.min(Number(liquidity), Number(accountAssetBalance));
 
                 const balance = Math.abs(Number(accountAssetBalance / BigInt(token.decimal))).toFixed(2);
 
@@ -170,7 +171,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 }
                 
                 // myBorrows
-                const maxRepayUsdt = Number(tokenData.balance).toFixed(2); //todo +t 
+                const maxRepay = Math.min(Number(tokenData.balance), Number(accountAssetBalance)); //todo +t 
 
                 if (accountAssetBalance < 0) {
                     myBorrows.push({
@@ -179,7 +180,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                         balance,
                         apy: apyBorrow,
                         accrued: '22',
-                        max: Number(maxRepayUsdt)
+                        max: maxRepay,
                     });
                 }
             }
