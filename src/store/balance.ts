@@ -91,12 +91,13 @@ export const useBalance = create<BalanceStore>((set, get) => {
             const borrowBalance = (Number(aggregatedBalance2) / Math.pow(10, 9)).toString();
             set({ borrowBalance });
 
-            const limitUsed = (Number(availableToBorrowData) / Math.pow(10, 9));
-            const totalLimit = limitUsed + Number(borrowBalance);
+            const limitUsed = Number(borrowBalance);
+
+            const totalLimit = limitUsed + (Math.abs(Number(availableToBorrowData)) / Math.pow(10, 9));            
 
             set({ borrowLimitValue: totalLimit });
             if (totalLimit !== 0) {
-                const borrowLimitPercent = Math.abs(limitUsed) / totalLimit;
+                const borrowLimitPercent = limitUsed / totalLimit;
                 set({ borrowLimitPercent });
             }
         }
@@ -155,9 +156,9 @@ export const useBalance = create<BalanceStore>((set, get) => {
                     b_rate: assetTokenData?.b_rate
                 });
 
-                const maxWithdraw = Math.min(Number(liquidity), Number(accountAssetBalance));
-
                 const balance = Math.abs(Number(accountAssetBalance / BigInt(token.decimal))).toFixed(2);
+
+                const maxWithdraw = Math.min(Number(liquidity), Number(balance));
 
                 if (accountAssetBalance > 0) {
                     mySupplies.push({
@@ -171,7 +172,9 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 }
                 
                 // myBorrows
-                const maxRepay = Math.min(Number(tokenData.balance), Number(accountAssetBalance)); //todo +t 
+                const maxRepay = Math.min(Number(tokenData.balance), Math.abs(Number(accountAssetBalance))); //todo +t 
+                console.log(Number(tokenData.balance), Number(accountAssetBalance)  +  '       skaskdask');
+                
 
                 if (accountAssetBalance < 0) {
                     myBorrows.push({
