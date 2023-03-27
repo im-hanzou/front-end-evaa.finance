@@ -36,5 +36,5 @@ export function randomAddress(seed: string, workchain?: number) {
 export function calcApy({ rate}: {rate: bigint}) {
     const borrowMath = Number(rate) / Math.pow(10, 12);
 
-    return (((borrowMath * 360 * 24 + 1) ^ 365 - 1) / Math.pow(10, 4));
+    return (((borrowMath * 360 * 24 + 1) ^ 365 - 1) / Math.pow(10, 6));
 }

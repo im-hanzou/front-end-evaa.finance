@@ -173,7 +173,6 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 
                 // myBorrows
                 const maxRepay = Math.min(Number(tokenData.balance), Math.abs(Number(accountAssetBalance))); //todo +t 
-                console.log(Number(tokenData.balance), Number(accountAssetBalance)  +  '       skaskdask');
                 
 
                 if (accountAssetBalance < 0) {
