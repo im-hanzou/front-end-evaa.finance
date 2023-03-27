@@ -42,7 +42,7 @@ export const MySuppliesAssetCard = ({ onClick, token, balance, apy, earned } : A
                 <DoubleTextLower>{formatToUsd(token, balance)}</DoubleTextLower>
             </DoubleTextWrapper>
             <DoubleTextWrapper right={30.1}>
-                <DoubleTextUpper>{(parseFloat(apy.toString()).toFixed(2))} %</DoubleTextUpper>
+                <DoubleTextUpper>{formatPercent(apy)} %</DoubleTextUpper>
                 {/* <DoubleTextLower>{earned} {TokenMap[token].ticker}</DoubleTextLower> */}
             </DoubleTextWrapper>
             <AssetCardButton onClick={onClick} right={0}>Withdraw</AssetCardButton>
