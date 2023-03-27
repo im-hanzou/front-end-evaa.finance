@@ -120,7 +120,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             // supplies
             const apySupply = ratesPerSecond ? calcApy({rate: ratesPerSecond.s_rate_per_second }) : 0;
-
+            
             supplies.push({
                 id: String(tokenKey),
                 token: tokenKey,

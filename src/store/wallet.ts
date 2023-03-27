@@ -125,7 +125,6 @@ export const useWallet = create<AuthStore>((set, get) => {
       }
 
       if (action === Action.supply || action === Action.repay) {
-        console.log(token, Token.TON);
         
         if (String(token) === String(Token.TON)) {
           const body = beginCell().endCell();
