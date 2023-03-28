@@ -25,7 +25,7 @@ interface TokenMapValue {
     tokenId: string;
     decimal: number,
     icon: any,
-    getAddress: () => Promise<Address>;
+    getAddress: (ownerAddress?: Address) => Promise<Address>;
     getBalance: (userAddress: Address) => Promise<string>
 }
 
@@ -39,7 +39,7 @@ export const TokenMap: TokenMapType = {
         tokenId: 'ton',
         decimal: Math.pow(10, 9),
         icon: TONLogo,
-        async getAddress() {
+        async getAddress(_?: any) {
             return TON_JETTON_ADDRESS;
         },
         async getBalance(userAddress: Address) {
@@ -51,9 +51,9 @@ export const TokenMap: TokenMapType = {
         tokenId: 'usdt',
         decimal: Math.pow(10, 6),
         icon: USDTLogo,
-        async getAddress() {
+        async getAddress(ownerAddress?: Address) {
             const contract = new Minter(USDT_EVAA_ADDRESS);
-            return await tonClient.open(contract).getWalletAddress(MASTER_EVAA_ADDRESS) as Address;
+            return await tonClient.open(contract).getWalletAddress(ownerAddress ?? MASTER_EVAA_ADDRESS) as Address;
         },
         async getBalance(userAddress: Address) {
             const contract = new Minter(USDT_EVAA_ADDRESS);
@@ -121,26 +121,28 @@ export const useTokens = create<TokenStore>((set, get) => {
             const tokenKey = tokenRawKey as unknown as Token; // force cast to enum
             const token = TokenMap[tokenKey];
             const tokenData = get().tokens[tokenKey] as TokenData;
-            
+
             await callback({ tokenKey, token, tokenData });
         }
     }
 
     const initTokens = async (userAddress?: Address) => {
-        await forEachToken(async ({tokenKey, token}) => {
+        await forEachToken(async ({ tokenKey, token }) => {
             const address = await token.getAddress();
             const balance = userAddress ? await token.getBalance(userAddress) : '0'; // not logged yet
             const hashKey = bufferToBigInt(address.hash);
 
-            set({ tokens: {
-                ...get().tokens,
-                [tokenKey]: {
-                    balance,
-                    price: 0,
-                    address,
-                    hashKey
+            set({
+                tokens: {
+                    ...get().tokens,
+                    [tokenKey]: {
+                        balance,
+                        price: 0,
+                        address,
+                        hashKey
+                    }
                 }
-            }})
+            })
         });
 
         set({ isLoading: false });
@@ -156,19 +158,21 @@ export const useTokens = create<TokenStore>((set, get) => {
         forEachToken,
         formatToUsd: (token, value = '') => {
             const tokenPrice = get().tokens[token]?.price || 0; // in case prices not loaded yet
-            const usd =  parseFloat(value) * Number(tokenPrice);
+            const usd = parseFloat(value) * Number(tokenPrice);
 
             return formatUsd(usd);
         },
 
         setTokenPrice: (token: Token, price: Number) => {
-            set({ tokens: {
-                ...get().tokens,
-                [token]: {
-                    ...get().tokens[token],
-                    price
+            set({
+                tokens: {
+                    ...get().tokens,
+                    [token]: {
+                        ...get().tokens[token],
+                        price
+                    }
                 }
-            }})
+            })
         }
     }
 

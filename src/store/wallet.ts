@@ -43,7 +43,7 @@ export const useWallet = create<AuthStore>((set, get) => {
   connector.onStatusChange((async (wallet) => {
     const userFriendlyAddress = friendlifyUserAddress(wallet?.account.address);
     const userAddress = Address.parse(wallet?.account.address as string);
-  
+
     set(() => ({ wallet, userAddress: userFriendlyAddress, universalLink: '' }));
 
     useTokens.getState().initTokens(userAddress);
@@ -103,10 +103,12 @@ export const useWallet = create<AuthStore>((set, get) => {
     sendTransaction: async (amount: string, token: Token, action: Action) => {
       const hashKey = useTokens.getState().tokens[token]?.hashKey as bigint;
       const jettonAddress = useTokens.getState().tokens[token]?.address as Address;
-      const nanoAmount =  BigInt(Number(amount) * TokenMap[token].decimal);
-
+      const nanoAmount = BigInt(Number(amount) * TokenMap[token].decimal);
       const address = MASTER_EVAA_ADDRESS.toString();
 
+      console.log('----------------------')
+      console.log(address, amount, nanoAmount, token, action)
+      console.log('----------------------')
       let messages = [];
 
       if (action === Action.withdraw || action === Action.borrow) {
@@ -125,7 +127,7 @@ export const useWallet = create<AuthStore>((set, get) => {
       }
 
       if (action === Action.supply || action === Action.repay) {
-        
+
         if (String(token) === String(Token.TON)) {
           const body = beginCell().endCell();
 
@@ -136,6 +138,9 @@ export const useWallet = create<AuthStore>((set, get) => {
           })
         } else {
           // API for rest jettons should be same
+          //@ts-ignore
+          const userJettonWalletAddress = await TokenMap[token].getAddress(Address.parse(connector?.wallet?.account.address)) as Address;
+
           const body = beginCell()
             .storeUint(0xf8a7ea5, 32)
             .storeUint(0, 64)
@@ -148,11 +153,7 @@ export const useWallet = create<AuthStore>((set, get) => {
             .endCell()
 
           messages.push({
-            address: jettonAddress.toString({
-              urlSafe: true,
-              bounceable: false,
-              testOnly: true
-            }),
+            address: userJettonWalletAddress.toString(),
             amount: toNano('0.2').toString(),
             payload: body.toBoc().toString('base64'),
           })
@@ -162,17 +163,18 @@ export const useWallet = create<AuthStore>((set, get) => {
       set({ isWaitingResponse: true });
 
       try {
+        console.log(messages)
         await connector.sendTransaction({
           validUntil: (new Date()).getTime() / 1000 + 5 * 1000 * 60,
           messages
         });
-        
+
         set({ isWaitingResponse: false });
 
-      } catch(e) {
+      } catch (e) {
         set({ isWaitingResponse: false });
 
-        throw(e);
+        throw (e);
       }
     },
 
