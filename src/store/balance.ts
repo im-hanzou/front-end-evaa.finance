@@ -85,7 +85,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const availableToBorrowData = isInitedUser ? await getAvailableToBorrow({ userContractAddress, assetConfigDict, assetDataDict }) : BigInt(0);  
 
         if (get()?.userAddress) {
-            const supplyBalance = (Number(aggregatedBalance1) / Math.pow(10, 10)).toString();
+            const supplyBalance = (Number(aggregatedBalance1) / Math.pow(10, 9)).toString();
             set({ supplyBalance });
 
             const borrowBalance = (Number(aggregatedBalance2) / Math.pow(10, 9)).toString();
