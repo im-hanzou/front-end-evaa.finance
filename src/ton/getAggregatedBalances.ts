@@ -39,9 +39,6 @@ export async function getAggregatedBalances({ userContractAddress, assetDataDict
     } catch (e) {
         console.log('error with getAggregatedBalances', e)
     }
-    console.log(aggregatedBalance1)
-    console.log(aggregatedBalance2)
-    console.log(isInitedUser)
     return {
         aggregatedBalance1,
         aggregatedBalance2,

@@ -20,7 +20,6 @@ const Borrows = ({ tab }: BorrowsProps) => {
     const { myBorrows, borrows } = useBalance();
     const [selectedMyBorrow, setSelectedMyBorrow] = useState<MyBorrow | undefined>();
     const [selectedBorrow, setSelectedBorrow] = useState<Borrow | undefined>();
-    console.log(borrows)
     const currentMyBorrows = tab === '1' ? myBorrows : [];
     const currentBorrows = tab === '1' ? borrows : [];
 

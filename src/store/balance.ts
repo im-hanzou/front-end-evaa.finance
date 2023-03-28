@@ -132,7 +132,6 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             // borrows
             const assetReserve = dictReserves.get(tokenData.hashKey)?.reserve;
-            console.log(dictReserves)
             const apyBorrow = ratesPerSecond ? calcApy({ rate: ratesPerSecond.b_rate_per_second }) : 0;
             const liquidity = (Math.abs(Number(assetTokenData?.balance) - Number(assetReserve)) / token.decimal).toFixed(2);
             const maxBorrow = Math.min(Number(liquidity), Math.abs(Number(availableToBorrowData) / Number(assetTokenData?.price)));
@@ -173,7 +172,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 }
 
                 // myBorrows
-                const maxRepay = Math.min(Number(tokenData.balance), Math.abs(Number(accountAssetBalance))); //todo +t 
+                const maxRepay = Math.min(Number(tokenData.balance), Number(Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(2))); //todo +t 
 
 
                 if (accountAssetBalance < 0) {

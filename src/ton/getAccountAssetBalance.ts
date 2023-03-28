@@ -11,9 +11,6 @@ interface getAccountAssetBalanceProps {
 
 export async function getAccountAssetBalance({ userContractAddress, address, s_rate, b_rate }: getAccountAssetBalanceProps): Promise<bigint> {
     const argsUser = new TupleBuilder();
-    console.log(address.toString())
-    console.log(s_rate)
-    console.log(b_rate)
     argsUser.writeAddress(address);
     argsUser.writeNumber(s_rate);
     argsUser.writeNumber(b_rate);
@@ -28,6 +25,7 @@ export async function getAccountAssetBalance({ userContractAddress, address, s_r
         );
 
         accountAssetBalance = BigInt(accountAssetBalanceUsdt.stack.readNumber());
+        
     } catch (e) {
         console.log('error with getAccountAssetBalance', e)
     }
