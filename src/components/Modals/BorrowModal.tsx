@@ -155,7 +155,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
         } catch {
             notification.open({
                 message: 'Transaction not completed',
-                description: 'The transaction was canceled by the user or another error occurred, try again',
+                description: 'The transaction was canceled by the user or another error occurred. Please, try again.',
                 icon: <ExclamationCircleIcon color='red' width='32px' height='32px' />,
             }); 
         }

@@ -170,7 +170,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                         token: tokenKey,
                         balance,
                         apy: apySupply,
-                        earned: '13',
+                        earned: '0',
                         max: maxWithdraw
                     });
                 }
