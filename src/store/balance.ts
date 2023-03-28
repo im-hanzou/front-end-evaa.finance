@@ -158,7 +158,8 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
                 const balance = Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(2);
 
-                const maxWithdraw = Math.min(Number(liquidity), Number(balance));
+                const maxWithdraw = Math.min(Number(liquidity), Math.abs(Number(accountAssetBalance) / token.decimal));
+                
 
                 if (accountAssetBalance > 0) {
                     mySupplies.push({
