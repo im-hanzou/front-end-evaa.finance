@@ -10,7 +10,7 @@ export async function getUIVariables() {
         MASTER_EVAA_ADDRESS,
         'getUIVariables',
     );
-    
+
     // 1 ------ASSET DATA---------
     const assetDataDict = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), {
         serialize: (src: any, buidler: any) => {
@@ -35,7 +35,7 @@ export async function getUIVariables() {
         }
         //@ts-ignore
     }, stack.readCellOpt());
-    
+
     // 2 -----------POOL METADATA----
     //@ts-ignore
     const conf = stack.pop().cell.beginParse();
@@ -44,7 +44,7 @@ export async function getUIVariables() {
     // 3 -------ASSET CONFIG-------
     conf.loadRef();
     const confItems = conf.loadRef().beginParse();
-    
+
     const assetConfigDict = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), { //asset config
         serialize: (src: any, buidler: any) => {
             buidler.storeAddress(src.oracle);
@@ -74,7 +74,7 @@ export async function getUIVariables() {
             const supplyRateSlopeLow = BigInt(ref.loadUint(64));  //.store_uint(supply_rate_slope_low, 64) 
             const supplyRateSlopeHigh = BigInt(ref.loadUint(64)); //.store_uint(supply_rate_slope_high, 64) 
             const targeUtilization = BigInt(ref.loadUint(64));    //.store_uint(target_utilization, 64) 
-            
+
             return {
                 oracle, decimals, collateralFactor, liquidationThreshold,
                 liquidationPenalty, baseBorrowRate, borrowRateSlopeLow,
@@ -83,13 +83,13 @@ export async function getUIVariables() {
         }
         //@ts-ignore
     }, confItems.loadRef().beginParse());
-    
+
     // get asset config by address
-    
+
     // 4 -----------IS POOL ACTIVE?----
     //if pool active = -1 (true) / 0 (false)
     const isPoolActive = confItems.loadInt(8) === -1;
-    
+
     // 5 ----SRATE BRATE PER SEC BY ASSET----
     const dictRates = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), {
         serialize: (src: any, buidler: any) => {
@@ -101,8 +101,8 @@ export async function getUIVariables() {
             return { s_rate_per_second, b_rate_per_second };
         }
     }, stack.readCellOpt())
-    
-    
+
+
     // 6 ---------RESERVE BY ASSET------
     const dictReserves = Dictionary.loadDirect(Dictionary.Keys.BigUint(256), {
         serialize: (src: any, buidler: any) => {
@@ -110,9 +110,12 @@ export async function getUIVariables() {
         },
         parse: (src: Slice) => {
             const reserve = BigInt(src.loadInt(65)); //s_rate_per_second 64bit
+            console.log(reserve)
             return { reserve };
         }
     }, stack.readCellOpt())
+
+    console.log(dictReserves)
 
     const output = {
         dictReserves,

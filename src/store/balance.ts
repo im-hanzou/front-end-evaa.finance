@@ -78,12 +78,8 @@ export const useBalance = create<BalanceStore>((set, get) => {
     const updateData = async () => {
         const { assetDataDict, assetConfigDict, dictRates, dictReserves } = await getUIVariables();
 
-        if (!get().userAddress) {
-            return
-        }
-
         const userContractAddress = getUserContractAddress(get().userAddress);
-        const { aggregatedBalance1, aggregatedBalance2, isInitedUser } = await getAggregatedBalances({ userContractAddress, assetConfigDict, assetDataDict });
+        const { aggregatedBalance1, aggregatedBalance2, isInitedUser } = !get().userAddress ? { aggregatedBalance1: BigInt(0), aggregatedBalance2: BigInt(0), isInitedUser: false } : await getAggregatedBalances({ userContractAddress, assetConfigDict, assetDataDict });
         set({ isInitedUser });
 
         const availableToBorrowData = isInitedUser ? await getAvailableToBorrow({ userContractAddress, assetConfigDict, assetDataDict }) : BigInt(0);
@@ -94,6 +90,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             const borrowBalance = (Number(aggregatedBalance2) / Math.pow(10, 9)).toString();
             set({ borrowBalance });
+
 
             const limitUsed = Number(borrowBalance);
 

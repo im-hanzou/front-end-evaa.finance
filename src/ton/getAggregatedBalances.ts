@@ -27,7 +27,6 @@ export async function getAggregatedBalances({ userContractAddress, assetDataDict
     let aggregatedBalance2 = BigInt(0);
     let isInitedUser = false;
 
-    console.log(userContractAddress.toString())
     try {
         const getAggregatedBalances = await tonClient.runMethod(
             userContractAddress,
@@ -40,7 +39,9 @@ export async function getAggregatedBalances({ userContractAddress, assetDataDict
     } catch (e) {
         console.log('error with getAggregatedBalances', e)
     }
-
+    console.log(aggregatedBalance1)
+    console.log(aggregatedBalance2)
+    console.log(isInitedUser)
     return {
         aggregatedBalance1,
         aggregatedBalance2,
