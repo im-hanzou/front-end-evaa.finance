@@ -139,7 +139,7 @@ export const useWallet = create<AuthStore>((set, get) => {
         } else {
           // API for rest jettons should be same
           // @ts-ignore
-          const userJettonWalletAddress = await TokenMap[token].getAddress(Address.parse(connector?.wallet?.account.address || '0')) as Address;
+          const userJettonWalletAddress = await TokenMap[token].getAddress(Address.parse(connector?.wallet?.account.address)) as Address;
 
           const body = beginCell()
             .storeUint(0xf8a7ea5, 32)
