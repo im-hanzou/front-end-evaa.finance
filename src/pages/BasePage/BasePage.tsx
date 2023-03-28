@@ -1,5 +1,5 @@
 import Header from '../../components/Header/Header';
-import { BasePageContainer, ContentWrapper, MobileInfo, MobileWrapper, TestnetInfo, TestnetMinor } from './BasePageStyles';
+import { BasePageContainer, ContentWrapper, TestnetInfo, TestnetMinor } from './BasePageStyles';
 import InfoBar from '../../components/BasePageComponents/InfoBar/InfoBar';
 import Supplies from './Assets/Supplies';
 import Borrows from './Assets/Borrows';
@@ -35,40 +35,52 @@ const StyledTabs = styled(Tabs)`
 
 
 const items: TabsProps['items'] = [
-    {
-      key: '1',
-      label: `Main Pool`,    
-    },
-    {
-      key: '2',
-      label: `Ecosystem Pool`,
-    },
-  ];
+  {
+    key: '1',
+    label: `Main Pool`,    
+  },
+  {
+    key: '2',
+    label: `Ecosystem Pool`,
+  },
+];
+
+
+const mobileItems: TabsProps['items'] = [
+  {
+    key: '1',
+    label: `Supply`,    
+  },
+  {
+    key: '2',
+    label: `Borrow`,
+  },
+];
 
 
 const BasePage = () => {
   const [ tab, setTab ] = useState('1');
   const isMobile = window.innerWidth < 480;
 
-  if(isMobile){
-    return (
-      <MobileWrapper>
-        <Header />
-        <MobileInfo>Open From Desktop. Mobile is not supported at the moment</MobileInfo>
-      </MobileWrapper>
-    )
-  }
-
   return (
     <BasePageContainer>
-        <TestnetInfo>TEST NET. <TestnetMinor>Switch your wallet to testnet to use</TestnetMinor></TestnetInfo>
+        <TestnetInfo><TestnetMinor>Configure your wallet for use with the</TestnetMinor> TESTNET</TestnetInfo>
         <Header />
         <InfoBar />
-        <StyledTabs defaultActiveKey="1" items={items} onChange={setTab} />
-        <ContentWrapper>
-            <Supplies tab={tab}/>
-            <Borrows tab={tab}/>
-        </ContentWrapper>
+        <StyledTabs centered={isMobile} defaultActiveKey="1" items={isMobile ? mobileItems : items} onChange={setTab} />
+        {!isMobile && 
+          <ContentWrapper>
+              <Supplies tab={tab}/>
+              <Borrows tab={tab}/>
+          </ContentWrapper>
+        }
+
+        {isMobile && tab === '1' &&
+          <Supplies tab={'1'}/>
+        }
+        {isMobile && tab === '2' &&
+          <Borrows tab={'1'}/>
+        }
         <Footer />
     </BasePageContainer>
   )

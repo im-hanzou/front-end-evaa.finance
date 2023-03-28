@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-// import { RecoilRoot } from 'recoil';
 import { ThemeProvider } from 'styled-components';
+
 import './index.css';
 import App from './App';
 import GlobalStyles from './globalStyles';
@@ -26,12 +26,10 @@ const theme = {
 root.render(
   <React.StrictMode>
     <Suspense fallback={<LoadingComponent/>}>
-        {/* <RecoilRoot> */}
-          <ThemeProvider theme={theme}>
-            <GlobalStyles/>
-            <App />
-          </ThemeProvider>
-        {/* </RecoilRoot> */}
+      <ThemeProvider theme={theme}>
+        <GlobalStyles/>
+        <App />
+      </ThemeProvider>
     </Suspense>
   </React.StrictMode>
 );

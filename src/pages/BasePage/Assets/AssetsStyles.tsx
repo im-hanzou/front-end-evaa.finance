@@ -7,6 +7,10 @@ export const AssetsWrapper = styled.div`
     align-items: center;
     justify-content: flex-start;
     width: 48%;
+    
+    @media only screen and (max-width: 480px) {
+        width: 90%;
+    }
 `
 
 export const AssetsSubWrapper = styled.div`
@@ -25,10 +29,17 @@ export const AssetsTitle = styled(MediumRobotoText)`
     font-size: 2.2rem;
     margin-bottom: 3rem;
     color: ${props => props.theme.black};
+    
+    @media only screen and (max-width: 480px) {
+    }
 `
 
 export const AssetsSubtitle = styled(MediumRobotoText)`
     margin-top: 2.5rem;
     font-size: 1.8rem;
     color: ${props => props.theme.grayLight};
+    
+    @media only screen and (max-width: 480px) {
+        margin-top: 0;
+    }
 `

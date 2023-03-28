@@ -1,5 +1,5 @@
 import React from 'react';
-import { BorderDivBottom, BorderDivTop, AssetsDescriptionBarWrapper, AssetsDescriptionText } from './AssetsDescriptionBarStyles';
+import { BorderDivBottom, BorderDivTop, AssetsDescriptionBarWrapper, AssetsDescriptionText, AssetsDescriptionTextMobileHide } from './AssetsDescriptionBarStyles';
 
 
 export interface AssetsDescriptionBarProps { }
@@ -7,9 +7,9 @@ export interface AssetsDescriptionBarProps { }
 export const SupplyDescriptionBar = ({} : AssetsDescriptionBarProps) => {    
     return (
         <AssetsDescriptionBarWrapper>
-            <AssetsDescriptionText>Asset</AssetsDescriptionText>
+            <AssetsDescriptionTextMobileHide>Asset</AssetsDescriptionTextMobileHide>
             <AssetsDescriptionText right={42.5}>Wallet Balance</AssetsDescriptionText>
-            <AssetsDescriptionText right={30.6}>APY</AssetsDescriptionText>
+            <AssetsDescriptionTextMobileHide right={30.6}>APY</AssetsDescriptionTextMobileHide>
         </AssetsDescriptionBarWrapper>
     )
 }
@@ -17,9 +17,9 @@ export const SupplyDescriptionBar = ({} : AssetsDescriptionBarProps) => {
 export const MySuppliesDescriptionBar = ({} : AssetsDescriptionBarProps) => {    
     return (
         <AssetsDescriptionBarWrapper>
-            <AssetsDescriptionText>Asset</AssetsDescriptionText>
+            <AssetsDescriptionTextMobileHide>Asset</AssetsDescriptionTextMobileHide>
             <AssetsDescriptionText right={42.5}>Balance</AssetsDescriptionText>
-            <AssetsDescriptionText right={30.6}>APY</AssetsDescriptionText>
+            <AssetsDescriptionTextMobileHide right={30.6}>APY</AssetsDescriptionTextMobileHide>
         </AssetsDescriptionBarWrapper>
     )
 }
@@ -27,18 +27,18 @@ export const MySuppliesDescriptionBar = ({} : AssetsDescriptionBarProps) => {
 export const BorrowDescriptionBar = ({} : AssetsDescriptionBarProps) => {    
     return (
         <AssetsDescriptionBarWrapper>
-            <AssetsDescriptionText>Asset</AssetsDescriptionText>
+            <AssetsDescriptionTextMobileHide>Asset</AssetsDescriptionTextMobileHide>
             <AssetsDescriptionText right={42.5}>Liquidity</AssetsDescriptionText>
-            <AssetsDescriptionText right={30.6}>APY</AssetsDescriptionText>
+            <AssetsDescriptionTextMobileHide right={30.6}>APY</AssetsDescriptionTextMobileHide>
         </AssetsDescriptionBarWrapper>
     )
 }
 export const MyBorrowsDescriptionBar = ({} : AssetsDescriptionBarProps) => {    
     return (
         <AssetsDescriptionBarWrapper>
-            <AssetsDescriptionText>Asset</AssetsDescriptionText>
+            <AssetsDescriptionTextMobileHide>Asset</AssetsDescriptionTextMobileHide>
             <AssetsDescriptionText right={42.5}>Balance</AssetsDescriptionText>
-            <AssetsDescriptionText right={30.6}>APY</AssetsDescriptionText>
+            <AssetsDescriptionTextMobileHide right={30.6}>APY</AssetsDescriptionTextMobileHide>
         </AssetsDescriptionBarWrapper>
     )
 }

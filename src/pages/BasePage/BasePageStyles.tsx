@@ -10,16 +10,12 @@ export const BasePageContainer = styled.div`
     min-height: 100vh;
     /* background-color: ${props => props.theme.light}; */
     background: linear-gradient(
-    to top,
-    #F9FAFB 0%,
-    #F9FAFB 52%,
-    #080A0E 52%,
-    #080A0E 100%
+    to bottom,
+    #080A0E 0%,
+    #080A0E 55rem,
+    #F9FAFB 55rem,
+    #F9FAFB 100%
   );
-    /* z-index: 100; */
-    @media only screen and (min-width: 480px) {
-        /* width: 100%; */
-    }  
 `
 
 export const BasePageBackgroundOne = styled.div`
@@ -46,6 +42,14 @@ export const TestnetInfo = styled(BoldRobotoText)`
     transform: translateX(-50%);
     top: 37rem;
     font-size: 1.5rem;
+
+    
+    @media only screen and (max-width: 480px) {
+        top: 8rem;
+        left: 2rem;
+        right: 1rem;
+        transform: none;
+    }  
 `
 
 export const TestnetMinor = styled(MediumRobotoText)`

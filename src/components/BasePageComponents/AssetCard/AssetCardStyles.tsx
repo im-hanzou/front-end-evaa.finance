@@ -7,7 +7,11 @@ export const AssetCardWrapper = styled.div`
     display: flex;
     width: 100%;
     padding: 4.4rem 0rem;
-    /* margin: 0.5rem 0rem; */
+    
+    @media only screen and (max-width: 480px) {
+        padding: 0rem;
+        height: 8rem;
+    }  
 `
 
 export const AssetCardText = styled(RegularRobotoText)<{ left?: number, right?: number,  first?: boolean }>`
@@ -19,6 +23,27 @@ export const AssetCardText = styled(RegularRobotoText)<{ left?: number, right?: 
     text-align: right;
     font-size: 1.8rem;
     color: ${props => props.theme.blackText};
+    
+    @media only screen and (max-width: 480px) {
+        white-space: nowrap;
+        left: 5rem;
+        top: 3.8rem;
+    }  
+`
+
+export const AssetCardTextMobileHide = styled(RegularRobotoText)<{ left?: number, right?: number,  first?: boolean }>`
+    transform: translateY(-50%);
+    top: 50%;
+    position: absolute;
+    right: ${props => props.right && props.right}rem;
+    left : ${props => !props.right && 0}rem;
+    text-align: right;
+    font-size: 1.8rem;
+    color: ${props => props.theme.blackText};
+    
+    @media only screen and (max-width: 480px) {
+        display: none;
+    }  
 `
 
 export const  AssetWrapper = styled.div<{ left?: number, right?: number,  first?: boolean }>`
@@ -40,6 +65,10 @@ export const AssetCardTextSimple = styled(RegularRobotoText)`
     font-size: 1.8rem;
     color: ${props => props.theme.blackText};
     margin-left: 1.5rem;
+    
+    @media only screen and (max-width: 480px) {
+        display: none;
+    }
 `
 
 export const AssetCardLogo = styled.img`
@@ -58,6 +87,28 @@ export const DoubleTextWrapper = styled.div<{ left?: number, right?: number,  fi
     position: absolute;
     right: ${props => props.right && props.right}rem;
     left : ${props => !props.right && 0}rem;
+
+    @media only screen and (max-width: 480px) {
+        left: 5rem;
+        top: 4rem;
+        white-space: nowrap;
+        align-items: start;
+    }
+`
+export const DoubleTextWrapperMobileHide = styled.div<{ left?: number, right?: number,  first?: boolean }>`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    transform: translateY(-50%);
+    top: 50%;
+    position: absolute;
+    right: ${props => props.right && props.right}rem;
+    left : ${props => !props.right && 0}rem;
+
+    @media only screen and (max-width: 480px) {
+        display: none;
+    }
 `
 
 export const DoubleTextUpper = styled(RegularRobotoText)`

@@ -10,7 +10,7 @@ export const AssetsDescriptionBarWrapper = styled.div`
     border-right: 0;
     /* padding: 1rem; */
     
-
+    @media only screen and (max-width: 480px) {}
 `
 
 export const BorderDivTop = styled.div`
@@ -38,4 +38,24 @@ export const AssetsDescriptionText = styled(RegularRobotoText)<{ left?: number, 
     text-align: right;
     font-size: 1.8rem;
     color: ${props => props.theme.grayLight};
+
+    @media only screen and (max-width: 480px) {
+        left: 5rem;
+        white-space: nowrap;
+    }
+`
+
+export const AssetsDescriptionTextMobileHide = styled(RegularRobotoText)<{ left?: number, right?: number,  first?: boolean }>`
+    transform: translateY(-50%);
+    top: 50%;
+    position: absolute;
+    right: ${props => props.right && props.right}rem;
+    left : ${props => !props.right && 0}rem;
+    text-align: right;
+    font-size: 1.8rem;
+    color: ${props => props.theme.grayLight};
+
+    @media only screen and (max-width: 480px) {
+        display: none;
+    }
 `

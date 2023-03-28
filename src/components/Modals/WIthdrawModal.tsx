@@ -22,6 +22,10 @@ const DialogStyled = styled(Dialog.Panel)`
     justify-content: flex-start;
     align-items: center;
     height: 59rem;
+    
+    @media only screen and (max-width: 480px) {
+        transform: scale(0.8);
+    }
 `
 
 const Title = styled(BoldRobotoText)`
