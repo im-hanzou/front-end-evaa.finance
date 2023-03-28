@@ -10,7 +10,7 @@ import { BorrowDescriptionBar, MyBorrowsDescriptionBar } from '../../../componen
 import { BorrowModal } from '../../../components/Modals/BorrowModal';
 import { RepayModal } from '../../../components/Modals/RepayModal';
 
-export interface BorrowsProps { 
+export interface BorrowsProps {
     tab: string;
 }
 
@@ -20,6 +20,7 @@ const Borrows = ({ tab }: BorrowsProps) => {
     const { myBorrows, borrows } = useBalance();
     const [selectedMyBorrow, setSelectedMyBorrow] = useState<MyBorrow | undefined>();
     const [selectedBorrow, setSelectedBorrow] = useState<Borrow | undefined>();
+    console.log(borrows)
     const currentMyBorrows = tab === '1' ? myBorrows : [];
     const currentBorrows = tab === '1' ? borrows : [];
 

@@ -110,12 +110,9 @@ export async function getUIVariables() {
         },
         parse: (src: Slice) => {
             const reserve = BigInt(src.loadInt(65)); //s_rate_per_second 64bit
-            console.log(reserve)
             return { reserve };
         }
     }, stack.readCellOpt())
-
-    console.log(dictReserves)
 
     const output = {
         dictReserves,
