@@ -156,7 +156,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                     b_rate: assetTokenData?.b_rate
                 });
 
-                const balance = Math.abs(Number(accountAssetBalance / BigInt(token.decimal))).toFixed(2);
+                const balance = Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(2);
 
                 const maxWithdraw = Math.min(Number(liquidity), Number(balance));
 
