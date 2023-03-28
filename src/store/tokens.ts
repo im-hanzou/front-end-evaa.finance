@@ -72,18 +72,18 @@ export const TokenMap: TokenMapType = {
             return usdtBalance;
         }
     },
-    [Token.TOS]: {
-        ticker: 'TOS',
-        tokenId: 'tos',
-        decimal: Math.pow(10, 6),
-        icon: TOSLogo,
-        async getAddress() {
-            return Address.parse('0:0000');
-        },
-        async getBalance() {
-            return '0';
-        }
-    }
+    // [Token.TOS]: {
+    //     ticker: 'TOS',
+    //     tokenId: 'tos',
+    //     decimal: Math.pow(10, 6),
+    //     icon: TOSLogo,
+    //     async getAddress() {
+    //         return Address.parse('0:0000');
+    //     },
+    //     async getBalance() {
+    //         return '0';
+    //     }
+    // }
 };
 
 interface TokenData {

@@ -26,7 +26,7 @@ export interface MyBorrow {
     balance: string;
     apy: number;
     accrued: string;
-    max: number;    
+    max: number;
 }
 
 export interface Supply {
@@ -78,11 +78,15 @@ export const useBalance = create<BalanceStore>((set, get) => {
     const updateData = async () => {
         const { assetDataDict, assetConfigDict, dictRates, dictReserves } = await getUIVariables();
 
+        if (!get().userAddress) {
+            return
+        }
+
         const userContractAddress = getUserContractAddress(get().userAddress);
         const { aggregatedBalance1, aggregatedBalance2, isInitedUser } = await getAggregatedBalances({ userContractAddress, assetConfigDict, assetDataDict });
         set({ isInitedUser });
 
-        const availableToBorrowData = isInitedUser ? await getAvailableToBorrow({ userContractAddress, assetConfigDict, assetDataDict }) : BigInt(0);  
+        const availableToBorrowData = isInitedUser ? await getAvailableToBorrow({ userContractAddress, assetConfigDict, assetDataDict }) : BigInt(0);
 
         if (get()?.userAddress) {
             const supplyBalance = (Number(aggregatedBalance1) / Math.pow(10, 9)).toString();
@@ -93,7 +97,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             const limitUsed = Number(borrowBalance);
 
-            const totalLimit = limitUsed + (Math.abs(Number(availableToBorrowData)) / Math.pow(10, 9));            
+            const totalLimit = limitUsed + (Math.abs(Number(availableToBorrowData)) / Math.pow(10, 9));
 
             set({ borrowLimitValue: totalLimit });
             if (totalLimit !== 0) {
@@ -107,20 +111,20 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const mySupplies: MySupply[] = [];
         const myBorrows: MyBorrow[] = [];
 
-        await useTokens.getState().forEachToken(async ({tokenKey, token, tokenData}) => {
+        await useTokens.getState().forEachToken(async ({ tokenKey, token, tokenData }) => {
             const assetTokenData = assetDataDict.get(tokenData.hashKey);
             const ratesPerSecond = dictRates.get(tokenData.hashKey);
-            
+
             // prices
             if (assetTokenData?.price) {
                 const price = BigInt(assetTokenData?.price) / BigInt(Math.pow(10, 9));
-                
+
                 useTokens.getState().setTokenPrice(tokenKey, Number(price));
             }
 
             // supplies
-            const apySupply = ratesPerSecond ? calcApy({rate: ratesPerSecond.s_rate_per_second }) : 0;
-            
+            const apySupply = ratesPerSecond ? calcApy({ rate: ratesPerSecond.s_rate_per_second }) : 0;
+
             supplies.push({
                 id: String(tokenKey),
                 token: tokenKey,
@@ -148,7 +152,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             if (isInitedUser) {
                 // mySupplies
-                
+
                 const accountAssetBalance = await getAccountAssetBalance({
                     userContractAddress,
                     address: tokenData.address,
@@ -170,10 +174,10 @@ export const useBalance = create<BalanceStore>((set, get) => {
                         max: maxWithdraw
                     });
                 }
-                
+
                 // myBorrows
                 const maxRepay = Math.min(Number(tokenData.balance), Math.abs(Number(accountAssetBalance))); //todo +t 
-                
+
 
                 if (accountAssetBalance < 0) {
                     myBorrows.push({
@@ -187,7 +191,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 }
             }
         });
-        
+
         set({ supplies, borrows, mySupplies, myBorrows, isLoading: false });
     }
 

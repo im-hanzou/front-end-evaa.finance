@@ -121,7 +121,7 @@ export const useWallet = create<AuthStore>((set, get) => {
 
         messages.push({
           address,
-          amount: toNano('0.1').toString(),
+          amount: toNano('0.222').toString(),
           payload: body.toBoc().toString('base64'),
         });
       }
@@ -138,7 +138,7 @@ export const useWallet = create<AuthStore>((set, get) => {
           })
         } else {
           // API for rest jettons should be same
-          //@ts-ignore
+          // @ts-ignore
           const userJettonWalletAddress = await TokenMap[token].getAddress(Address.parse(connector?.wallet?.account.address)) as Address;
 
           const body = beginCell()
@@ -148,13 +148,13 @@ export const useWallet = create<AuthStore>((set, get) => {
             .storeAddress(MASTER_EVAA_ADDRESS)
             .storeAddress(null) //responce add?
             .storeDict(null)
-            .storeCoins(toNano('0.1'))
+            .storeCoins(toNano('0.1333'))
             .storeMaybeRef(null) //tons to be forwarded
             .endCell()
 
           messages.push({
             address: userJettonWalletAddress.toString(),
-            amount: toNano('0.2').toString(),
+            amount: toNano('0.222').toString(),
             payload: body.toBoc().toString('base64'),
           })
         }
