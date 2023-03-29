@@ -145,8 +145,12 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
     const tokenAmount = watch("price");
     const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
 
-    let limitUsedPercent = !isMoreMax ? Number(formatToUsd(currentToken, tokenAmount, true)) * borrowLimitPercent / Number(borrowBalance) : borrowLimitPercent;
-    let borrowBalanceTotal = !isMoreMax ? formatUsd(Math.abs(Number(borrowBalance) - Number(formatToUsd(currentToken, tokenAmount, true)))) : formatUsd(0);
+    let limitUsedPercent = isMoreMax ?  borrowLimitPercent :
+        Number(formatToUsd(currentToken, tokenAmount, true)) * borrowLimitPercent / Number(borrowBalance);
+
+    let borrowBalanceTotal = isMoreMax ? formatUsd(0) : 
+        formatUsd(Math.abs(Number(borrowBalance) - Number(formatToUsd(currentToken, tokenAmount, true))));
+        
     const limitUsedTotal = formatPercent(borrowLimitPercent - limitUsedPercent);
 
 
