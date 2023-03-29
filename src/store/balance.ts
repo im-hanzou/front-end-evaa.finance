@@ -46,8 +46,8 @@ export interface Borrow {
 }
 
 interface BalanceStore {
-    borrowBalance: string;
-    supplyBalance: string;
+    borrowBalance: number;
+    supplyBalance: number;
     availableToBorrow: string;
     borrowLimitPercent: number;
     borrowLimitValue: number;
@@ -85,10 +85,10 @@ export const useBalance = create<BalanceStore>((set, get) => {
         const availableToBorrowData = isInitedUser ? await getAvailableToBorrow({ userContractAddress, assetConfigDict, assetDataDict }) : BigInt(0);
 
         if (get()?.userAddress) {
-            const supplyBalance = (Number(aggregatedBalance1) / Math.pow(10, 9)).toString();
+            const supplyBalance = Number(aggregatedBalance1) / Math.pow(10, 9);
             set({ supplyBalance });
 
-            const borrowBalance = (Number(aggregatedBalance2) / Math.pow(10, 9)).toString();
+            const borrowBalance = Number(aggregatedBalance2) / Math.pow(10, 9);
             set({ borrowBalance });
 
 
@@ -207,8 +207,8 @@ export const useBalance = create<BalanceStore>((set, get) => {
     setInterval(updateData, UPDATE_INTERVAL);
 
     return {
-        borrowBalance: '0',
-        supplyBalance: '0',
+        borrowBalance: 0,
+        supplyBalance: 0,
         borrowLimitPercent: 0,
         borrowLimitValue: 0,
         availableToBorrow: '0',

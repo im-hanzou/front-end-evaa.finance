@@ -1,6 +1,5 @@
 import { Dialog } from "@headlessui/react";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { XMarkIcon, ExclamationCircleIcon, RocketLaunchIcon, ArrowLongRightIcon } from '@heroicons/react/20/solid';
 import { notification } from 'antd';
@@ -132,10 +131,9 @@ interface FormData {
 }
 
 export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
-    const { borrowLimitPercent, borrowBalance, availableToBorrow, borrowLimitValue } = useBalance();
-    const { t, i18n } = useTranslation();
-    const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
-    const { formatToUsd } = useTokens();
+    const { borrowLimitPercent, borrowBalance} = useBalance();
+    const { register,  watch} = useForm<FormData>();
+    const { formatToUsd, getPrice } = useTokens();
 
     const currentToken = borrow?.token || Token.TON;
     const {ticker} = TokenMap[currentToken];
@@ -146,11 +144,11 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
     const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
 
     let limitUsedPercent = isMoreMax ?  borrowLimitPercent :
-        Number(formatToUsd(currentToken, tokenAmount, true)) * borrowLimitPercent / Number(borrowBalance);
+        getPrice(currentToken, tokenAmount) * borrowLimitPercent / borrowBalance;
 
     let borrowBalanceTotal = isMoreMax ? formatUsd(0) : 
-        formatUsd(Math.abs(Number(borrowBalance) - Number(formatToUsd(currentToken, tokenAmount, true))));
-        
+        formatUsd(Math.abs(borrowBalance - getPrice(currentToken, tokenAmount)));
+
     const limitUsedTotal = formatPercent(borrowLimitPercent - limitUsedPercent);
 
 
