@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { XMarkIcon, ExclamationCircleIcon, RocketLaunchIcon, ArrowLongRightIcon } from '@heroicons/react/20/solid';
 import { notification } from 'antd';
 
-import { formatPercent } from '@/utils';
+import { formatPercent, formatUsd } from '@/utils';
 import { useTokens, Token, TokenMap } from "@/store/tokens";
 import { Borrow, useBalance } from "@/store/balance";
 import { useWallet, Action } from '@/store/wallet';
@@ -133,13 +133,18 @@ interface FormData {
 
 export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
     const { t, i18n } = useTranslation();
+    const { borrowLimitValue, borrowLimitPercent, availableToBorrow } = useBalance();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
-    const { formatToUsd } = useTokens();
+    const { formatToUsd, } = useTokens();
 
     const currentToken = borrow?.token || Token.TON;
     const { ticker } = TokenMap[currentToken];
 
     const { sendTransaction, isWaitingResponse } = useWallet();
+    const limitUsedModalMath = Number(watch('price')) / borrowLimitValue;
+    const borrowBalanceModalMath = formatUsd(Math.abs(Number(availableToBorrow) - Number(formatToUsd(currentToken, watch('price'), true))));
+
+
 
     const tokenAmount = watch("price");
     const click = async () => {
@@ -183,14 +188,14 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
                         <InfoText>MAX</InfoText>
                         <InfoText>{borrow?.max} {ticker}</InfoText>
                     </InfoTextWrapper>
-                    {/* <InfoTextWrapper>
+                    <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>
-                        <InfoText>0% {<ArrowRight />} 28%</InfoText>
+                        <InfoText>{ formatPercent(limitUsedModalMath || 0) } {<ArrowRight />} { formatPercent(Math.abs(Number(borrowLimitPercent) + limitUsedModalMath)) } </InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit</InfoText>
-                        <InfoText>52$ {<ArrowRight />} 37.8$</InfoText>
-                    </InfoTextWrapper> */}
+                        <InfoText>{ formatToUsd(currentToken, watch('price')) } {<ArrowRight />}{ borrowBalanceModalMath }</InfoText>
+                    </InfoTextWrapper> 
                     <InfoTextWrapper>
                         <InfoText>APY (Interest)</InfoText>
                         <InfoTextBlue>{formatPercent(borrow?.apy)}</InfoTextBlue>

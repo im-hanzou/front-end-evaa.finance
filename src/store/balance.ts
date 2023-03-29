@@ -93,8 +93,10 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
 
             const limitUsed = Number(borrowBalance);
+            const availableToBorrow = (Math.abs(Number(availableToBorrowData)) / Math.pow(10, 9)).toFixed(2);
+            set({availableToBorrow});
 
-            const totalLimit = limitUsed + (Math.abs(Number(availableToBorrowData)) / Math.pow(10, 9));
+            const totalLimit = limitUsed + Number(availableToBorrow);
 
             set({ borrowLimitValue: totalLimit });
             if (totalLimit !== 0) {
