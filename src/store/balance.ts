@@ -146,6 +146,15 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 });
             }
 
+            if(dictReserves.get(tokenData.hashKey)?.reserve === undefined){ //delete after creating a stable on sc
+                borrows.push({
+                    id: 'aa',
+                    token: Token.TOS,
+                    liquidity: '0',
+                    apy: Number('0'),
+                    max: Number('0'),
+                })
+            }
             if (isInitedUser) {
                 // mySupplies
 
