@@ -112,7 +112,7 @@ interface TokenStore {
 
     // helpers
     forEachToken: (callback: (tokenIterator: TokenIteratorProps) => void) => void;
-    formatToUsd: (token: Token, value?: string) => string;
+    formatToUsd: (token: Token, value?: string, symbol?: boolean) => string;
 }
 
 export const useTokens = create<TokenStore>((set, get) => {
@@ -156,10 +156,13 @@ export const useTokens = create<TokenStore>((set, get) => {
         tokens: {},
         initTokens,
         forEachToken,
-        formatToUsd: (token, value = '') => {
+        formatToUsd: (token, value = '', symbol = false) => {
             const tokenPrice = get().tokens[token]?.price || 0; // in case prices not loaded yet
-            const usd = parseFloat(value) * Number(tokenPrice);
+            const usd = value ? parseFloat(value) * Number(tokenPrice) : 0;
 
+            if (symbol){
+                return String(usd);
+            }
             return formatUsd(usd);
         },
 

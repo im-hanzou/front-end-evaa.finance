@@ -132,7 +132,7 @@ interface FormData {
 }
 
 export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
-    const { borrowLimitPercent, borrowBalance, availableToBorrow } = useBalance();
+    const { borrowLimitPercent, borrowBalance, availableToBorrow, borrowLimitValue } = useBalance();
     const { t, i18n } = useTranslation();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
     const { formatToUsd } = useTokens();
@@ -143,6 +143,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
     const { sendTransaction, isWaitingResponse } = useWallet();
 
     const tokenAmount = watch("price");
+    const limitUsedModalMath = Number(watch('price')) / (borrow?.max || 1);
     const click = async () => {
         try {
             await sendTransaction(tokenAmount, currentToken, Action.repay);
@@ -175,7 +176,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
                 <MyStyledInput type='number' step='any' max={borrow?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
-                {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
+                {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch('price'))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
                 <Subtitle>Transaction Overview</Subtitle>
@@ -186,11 +187,11 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>
-                        <InfoText>{formatPercent(Number((borrowLimitPercent).toFixed(2)))} {<ArrowRight />} 100 %</InfoText>
+                        <InfoText> {formatPercent(limitUsedModalMath || 0)}{<ArrowRight />}{formatPercent(Math.abs(Number(borrowLimitPercent) - limitUsedModalMath))}</InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Balance</InfoText>
-                        <InfoText>{formatUsd(Number(borrowBalance).toFixed(2))} {<ArrowRight />} {formatUsd(availableToBorrow)}</InfoText>
+                        <InfoText>{formatToUsd(currentToken, watch('price'))} {<ArrowRight />} {formatUsd(Math.abs(Number(borrowBalance) - Number(formatToUsd(currentToken, watch('price'), true))))}</InfoText>
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
