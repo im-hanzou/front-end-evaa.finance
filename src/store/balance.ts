@@ -99,6 +99,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
             const totalLimit = limitUsed + Number(availableToBorrow);
 
             set({ borrowLimitValue: totalLimit });
+            
             if (totalLimit !== 0) {
                 const borrowLimitPercent = limitUsed / totalLimit;
                 set({ borrowLimitPercent });

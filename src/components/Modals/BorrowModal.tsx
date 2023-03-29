@@ -133,30 +133,22 @@ interface FormData {
 
 export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
     const { t, i18n } = useTranslation();
-    const { borrowLimitValue, borrowLimitPercent, availableToBorrow } = useBalance();
+    const { borrowLimitValue, borrowLimitPercent, availableToBorrow, borrowBalance } = useBalance();
     const { register, handleSubmit, watch, formState: { errors, } } = useForm<FormData>();
-    const { formatToUsd, } = useTokens();
+    const { formatToUsd } = useTokens();
 
     const currentToken = borrow?.token || Token.TON;
     const { ticker } = TokenMap[currentToken];
 
     const { sendTransaction, isWaitingResponse } = useWallet();
     const tokenAmount = watch("price");
+    const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
 
-    let limitUsedModalMath = 0;
-    let borrowBalanceModalMath = '0';
-    let value: string = '0';
+    let limitUsedPercent = Number(formatToUsd(currentToken, tokenAmount, true)) * borrowLimitPercent / Number(borrowBalance);
 
-    if (Number(tokenAmount) <= Number(borrow?.max)){
-        value = tokenAmount;
-        limitUsedModalMath = Number(tokenAmount) / borrowLimitValue;
-        borrowBalanceModalMath = formatUsd(Math.abs(Number(availableToBorrow) - Number(formatToUsd(currentToken, tokenAmount, true))));
-    } else {
-        value = String(borrow?.max || '0');
-        limitUsedModalMath = Number(borrow?.max) / borrowLimitValue;
-        borrowBalanceModalMath = formatUsd(Math.abs(Number(availableToBorrow) - Number(formatToUsd(currentToken, (String(borrow?.max) || '0'), true))));
-    }
+    let borrowBalanceTotal = formatUsd(Math.abs(Number(availableToBorrow) - Number(formatToUsd(currentToken, tokenAmount, true))))
 
+    const limitUsedTotal = formatPercent(borrowLimitPercent + limitUsedPercent);
 
 
     const click = async () => {
@@ -181,7 +173,6 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
             }); 
         }
     }
-    const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
 
 
     return (
@@ -202,11 +193,11 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>
-                        <InfoText>{ formatPercent(limitUsedModalMath || 0) } {<ArrowRight />} { formatPercent(Math.abs(Number(borrowLimitPercent) + limitUsedModalMath)) } </InfoText>
+                        <InfoText>{ formatPercent(borrowLimitPercent)} {<ArrowRight />} { limitUsedTotal } </InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit</InfoText>
-                        <InfoText>{ formatToUsd(currentToken, value) } {<ArrowRight />}{ borrowBalanceModalMath }</InfoText>
+                        <InfoText>{ formatUsd(availableToBorrow) } {<ArrowRight />}{ borrowBalanceTotal }</InfoText>
                     </InfoTextWrapper> 
                     <InfoTextWrapper>
                         <InfoText>APY (Interest)</InfoText>

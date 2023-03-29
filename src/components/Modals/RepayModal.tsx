@@ -143,20 +143,11 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
     const { sendTransaction, isWaitingResponse } = useWallet();
 
     const tokenAmount = watch("price");
+    const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
 
-    let limitUsedModalMath = 0;
-    let borrowBalanceModalMath = '0';
-    let value = '0';
-
-    if(Number(tokenAmount) <= Number(borrow?.max)){
-        value = tokenAmount;
-        limitUsedModalMath = Number(tokenAmount) / (borrow?.max || 1);
-        borrowBalanceModalMath = formatUsd(Math.abs(Number(borrowBalance) - Number(formatToUsd(currentToken, tokenAmount, true))));
-    } else {
-        value = String(borrow?.max || '0');
-        limitUsedModalMath = Number(borrow?.max) / (borrow?.max || 1);
-        borrowBalanceModalMath = formatUsd(Math.abs(Number(borrowBalance) - Number(formatToUsd(currentToken, (String(borrow?.max) || '0'), true))));
-    }
+    let limitUsedPercent = !isMoreMax ? Number(formatToUsd(currentToken, tokenAmount, true)) * borrowLimitPercent / Number(borrowBalance) : borrowLimitPercent;
+    let borrowBalanceTotal = !isMoreMax ? formatUsd(Math.abs(Number(borrowBalance) - Number(formatToUsd(currentToken, tokenAmount, true)))) : formatUsd(0);
+    const limitUsedTotal = formatPercent(borrowLimitPercent - limitUsedPercent);
 
 
     const click = async () => {
@@ -182,7 +173,6 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
         }
     }
 
-    const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
 
     return (
         <Dialog.Panel as={DialogStyled}>
@@ -202,11 +192,11 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>
-                        <InfoText> {formatPercent(limitUsedModalMath || 0)}{<ArrowRight />}{formatPercent(Math.abs(Number(borrowLimitPercent) - limitUsedModalMath))}</InfoText>
+                        <InfoText> {formatPercent(borrowLimitPercent)}{<ArrowRight />}{ limitUsedTotal }</InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Balance</InfoText>
-                        <InfoText>{formatToUsd(currentToken, value)} {<ArrowRight />} {borrowBalanceModalMath}</InfoText>
+                        <InfoText>{formatUsd(borrowBalance)} {<ArrowRight />} {borrowBalanceTotal}</InfoText>
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
