@@ -143,8 +143,22 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
     const { sendTransaction, isWaitingResponse } = useWallet();
 
     const tokenAmount = watch("price");
-    const limitUsedModalMath = Number(watch('price')) / (borrow?.max || 1);
-    const borrowBalanceModalMath = formatUsd(Math.abs(Number(borrowBalance) - Number(formatToUsd(currentToken, watch('price'), true))));
+
+    let limitUsedModalMath = 0;
+    let borrowBalanceModalMath = '0';
+    let value = '0';
+
+    if(Number(tokenAmount) <= Number(borrow?.max)){
+        value = tokenAmount;
+        limitUsedModalMath = Number(tokenAmount) / (borrow?.max || 1);
+        borrowBalanceModalMath = formatUsd(Math.abs(Number(borrowBalance) - Number(formatToUsd(currentToken, tokenAmount, true))));
+    } else {
+        value = String(borrow?.max || '0');
+        limitUsedModalMath = Number(borrow?.max) / (borrow?.max || 1);
+        borrowBalanceModalMath = formatUsd(Math.abs(Number(borrowBalance) - Number(formatToUsd(currentToken, (String(borrow?.max) || '0'), true))));
+    }
+
+
     const click = async () => {
         try {
             await sendTransaction(tokenAmount, currentToken, Action.repay);
@@ -192,7 +206,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Balance</InfoText>
-                        <InfoText>{formatToUsd(currentToken, watch('price'))} {<ArrowRight />} {borrowBalanceModalMath}</InfoText>
+                        <InfoText>{formatToUsd(currentToken, value)} {<ArrowRight />} {borrowBalanceModalMath}</InfoText>
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>

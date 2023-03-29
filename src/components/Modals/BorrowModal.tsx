@@ -141,12 +141,24 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
     const { ticker } = TokenMap[currentToken];
 
     const { sendTransaction, isWaitingResponse } = useWallet();
-    const limitUsedModalMath = Number(watch('price')) / borrowLimitValue;
-    const borrowBalanceModalMath = formatUsd(Math.abs(Number(availableToBorrow) - Number(formatToUsd(currentToken, watch('price'), true))));
-
-
-
     const tokenAmount = watch("price");
+
+    let limitUsedModalMath = 0;
+    let borrowBalanceModalMath = '0';
+    let value: string = '0';
+
+    if (Number(tokenAmount) <= Number(borrow?.max)){
+        value = tokenAmount;
+        limitUsedModalMath = Number(tokenAmount) / borrowLimitValue;
+        borrowBalanceModalMath = formatUsd(Math.abs(Number(availableToBorrow) - Number(formatToUsd(currentToken, tokenAmount, true))));
+    } else {
+        value = String(borrow?.max || '0');
+        limitUsedModalMath = Number(borrow?.max) / borrowLimitValue;
+        borrowBalanceModalMath = formatUsd(Math.abs(Number(availableToBorrow) - Number(formatToUsd(currentToken, (String(borrow?.max) || '0'), true))));
+    }
+
+
+
     const click = async () => {
         try {
             await sendTransaction(tokenAmount, currentToken, Action.borrow);
@@ -194,7 +206,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit</InfoText>
-                        <InfoText>{ formatToUsd(currentToken, watch('price')) } {<ArrowRight />}{ borrowBalanceModalMath }</InfoText>
+                        <InfoText>{ formatToUsd(currentToken, value) } {<ArrowRight />}{ borrowBalanceModalMath }</InfoText>
                     </InfoTextWrapper> 
                     <InfoTextWrapper>
                         <InfoText>APY (Interest)</InfoText>
