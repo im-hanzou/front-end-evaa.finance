@@ -6,17 +6,23 @@ import { bufferToBigInt } from '@/ton/utils';
 import { tonClient } from "@/ton/client";
 import { Minter } from "@/ton/minter";
 import { formatUsd } from '@/utils';
-import { MASTER_EVAA_ADDRESS, USDT_EVAA_ADDRESS, TON_JETTON_ADDRESS } from "@/config";
+import { MASTER_EVAA_ADDRESS, USDT_EVAA_ADDRESS, USDC_EVAA_ADDRESS, BTC_EVAA_ADDRESS, ETH_EVAA_ADDRESS, TON_JETTON_ADDRESS } from "@/config";
 
 import TONLogo from '../assets/pictures/ton_asset.png';
 import USDTLogo from '../assets/pictures/usdt_asset.png';
 import TOSLogo from '../assets/pictures/tos_asset.png';
+import USDCLogo from '../assets/pictures/usdc_asset.png';
+import ETHLogo from '../assets/pictures/eth_asset.png';
+import BTCLogo from '../assets/pictures/btc_asset.png';
 
 import { useBalance } from './balance';
 
 export enum Token {
     TON,
     USDT,
+    USDC,
+    BTC,
+    ETH,
     TOS,
 }
 
@@ -31,6 +37,25 @@ interface TokenMapValue {
 
 type TokenMapType = {
     [key in Token]: TokenMapValue
+}
+
+const getAddressByTokenId = async (tokenAddress: Address, ownerAddress?: Address) => {
+    const contract = new Minter(tokenAddress);
+    return await tonClient.open(contract).getWalletAddress(ownerAddress ?? MASTER_EVAA_ADDRESS) as Address;
+}
+
+const getBalanceByTokenId = async (tokenAddress: Address, userAddress: Address, decimal: number) => {
+    const contract = new Minter(tokenAddress);
+    const juserwalletEvaaMasterSC = await tonClient.open(contract).getWalletAddress(userAddress)
+    const contract1 = new Minter(Address.parseFriendly(juserwalletEvaaMasterSC.toString()).address);
+    let usdtBalance = '0';
+    try {
+        const juserwalletEvaaMasterSC1 = await tonClient.open(contract1).getBalance()
+        usdtBalance = String(juserwalletEvaaMasterSC1.readNumber() / decimal);
+    } catch (e) {
+        console.log('error with get usdtBalance', e)
+    }
+    return usdtBalance;
 }
 
 export const TokenMap: TokenMapType = {
@@ -52,24 +77,46 @@ export const TokenMap: TokenMapType = {
         decimal: Math.pow(10, 6),
         icon: USDTLogo,
         async getAddress(ownerAddress?: Address) {
-            const contract = new Minter(USDT_EVAA_ADDRESS);
-            return await tonClient.open(contract).getWalletAddress(ownerAddress ?? MASTER_EVAA_ADDRESS) as Address;
+            return await getAddressByTokenId(USDT_EVAA_ADDRESS, ownerAddress)
         },
         async getBalance(userAddress: Address) {
-            const contract = new Minter(USDT_EVAA_ADDRESS);
-            const juserwalletEvaaMasterSC = await tonClient.open(contract).getWalletAddress(userAddress)
-            const contract1 = new Minter(Address.parseFriendly(juserwalletEvaaMasterSC.toString()).address);
-
-            let usdtBalance = '0';
-
-            try {
-                const juserwalletEvaaMasterSC1 = await tonClient.open(contract1).getBalance()
-                usdtBalance = String(juserwalletEvaaMasterSC1.readNumber() / this.decimal);
-            } catch (e) {
-                console.log('error with get usdtBalance', e)
-            }
-
-            return usdtBalance;
+            return await getBalanceByTokenId(USDT_EVAA_ADDRESS, userAddress, this.decimal)
+        }
+    },
+    [Token.USDC]: {
+        ticker: 'USDC',
+        tokenId: 'usdc',
+        decimal: Math.pow(10, 6),
+        icon: USDCLogo,
+        async getAddress(ownerAddress?: Address) {
+            return await getAddressByTokenId(USDC_EVAA_ADDRESS, ownerAddress)
+        },
+        async getBalance(userAddress: Address) {
+            return await getBalanceByTokenId(USDC_EVAA_ADDRESS, userAddress, this.decimal)
+        }
+    },
+    [Token.BTC]: {
+        ticker: 'BTC',
+        tokenId: 'btc',
+        decimal: Math.pow(10, 8), // todo take it from sc 
+        icon: BTCLogo,
+        async getAddress(ownerAddress?: Address) {
+            return await getAddressByTokenId(BTC_EVAA_ADDRESS, ownerAddress)
+        },
+        async getBalance(userAddress: Address) {
+            return await getBalanceByTokenId(BTC_EVAA_ADDRESS, userAddress, this.decimal)
+        }
+    },
+    [Token.ETH]: {
+        ticker: 'ETH',
+        tokenId: 'eth',
+        decimal: Math.pow(10, 8), // todo take it from sc 
+        icon: ETHLogo,
+        async getAddress(ownerAddress?: Address) {
+            return await getAddressByTokenId(ETH_EVAA_ADDRESS, ownerAddress)
+        },
+        async getBalance(userAddress: Address) {
+            return await getBalanceByTokenId(ETH_EVAA_ADDRESS, userAddress, this.decimal)
         }
     },
     [Token.TOS]: {

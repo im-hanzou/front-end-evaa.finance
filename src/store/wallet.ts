@@ -11,7 +11,7 @@ import { Minter } from '@/ton/minter';
 
 import { Token, TokenMap, useTokens } from './tokens';
 
-const dappMetadata = { manifestUrl: 'https://raw.githubusercontent.com/evaafi/front-end/dev/getConfig.json' };
+const dappMetadata = { manifestUrl: 'https://raw.githubusercontent.com/evaafi/tonconnect-config/main/config.json' };
 
 export enum Action {
   supply,
