@@ -1,4 +1,5 @@
 import BasePage from "./pages/BasePage/BasePage";
+import FaucetPage from "./pages/FaucetPage/FaucetPage";
 
 interface IRoute {
     path: string;
@@ -13,6 +14,12 @@ const mainRoutes: IRoute[] = [
         name: 'Base',
         path: '/',
         component: BasePage,
+        auth: false
+    },
+    {
+        name: 'Faucet',
+        path: '/faucet',
+        component: FaucetPage,
         auth: false
     },
 ];
