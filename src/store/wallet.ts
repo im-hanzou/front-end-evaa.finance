@@ -121,7 +121,7 @@ export const useWallet = create<AuthStore>((set, get) => {
 
         messages.push({
           address,
-          amount: toNano('0.222').toString(),
+          amount: toNano('0.333').toString(),
           payload: body.toBoc().toString('base64'),
         });
       }
