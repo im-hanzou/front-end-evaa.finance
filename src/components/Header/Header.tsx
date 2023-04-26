@@ -5,12 +5,13 @@ import { BoldRobotoText } from '../Texts/MainTexts';
 import EvaaLogo from '../../assets/pictures/evaa_logo.png'
 import { TonConnectButton } from '@tonconnect/ui-react';
 import { useNavigate } from 'react-router';
-
-export interface HeaderProps { 
+import { Address } from 'ton'
+import { useWallet, Action } from '@/store/wallet';
+export interface HeaderProps {
     width?: string;
 }
 
-const HeaderWrapper = styled.div<{width?: string}>`
+const HeaderWrapper = styled.div<{ width?: string }>`
     /* z-index: 100; */
     display: flex;
     justify-content: space-between;
@@ -40,16 +41,54 @@ const Image = styled.div`
     background-size: contain;
     margin-bottom: 0.5rem;
 `
+const HeaderButtons = styled.div`
+    display: flex;
+    @media only screen and (max-width: 480px){
+        flex-direction: column-reverse;
+    }
+`
+const TokensFaucet = styled.div`
+    font-style: normal;
+    font-weight: 400;
+    height: 1.5rem;
+    font-size: 1.5rem;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    text-decoration: underline;
+    margin: 4px 8px -4px 0;
+    cursor: pointer;
+    @media only screen and (max-width: 480px){
+    display: none;
+    }
+`
 
-const Header = ({ width } : HeaderProps) => {    
+const Header = ({ width }: HeaderProps) => {
     const navigate = useNavigate();
+    const { wallet } = useWallet();
+    const getTokens = () => {
+        console.log()
+        fetch('http://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
+            method: "POST",
+            headers: {
+                Accept: "application/json, text/plain, */*",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                address: Address.parseRaw(wallet?.account.address ?? "").toString()
+            })
+        }).then(e => e.json()).then(e => alert(JSON.stringify(e)))
+    }
+
     return (
-        <HeaderWrapper  width={width}>
-            <IconWithTextWrapper  onClick={() => navigate("/")}>
-                <Image/>
+        <HeaderWrapper width={width}>
+            <IconWithTextWrapper onClick={() => navigate("/")}>
+                <Image />
                 <BoldRobotoText color='#FFFFFF'>EVAA</BoldRobotoText>
-            </IconWithTextWrapper>            
-            <AuthButton/>
+            </IconWithTextWrapper>
+            <HeaderButtons>
+                <TokensFaucet onClick={getTokens}>get testnet tokens</TokensFaucet >
+                <AuthButton />
+            </HeaderButtons>
         </HeaderWrapper>
     )
 }

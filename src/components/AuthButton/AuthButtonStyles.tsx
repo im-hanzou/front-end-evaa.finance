@@ -58,13 +58,13 @@ interface WalletNumWithMenuProps {
 	onDisconnect: () => void
 }
 
-export const WalletNumWithMenu = ({address, onDisconnect} : WalletNumWithMenuProps) => {
+export const WalletNumWithMenu = ({ address, onDisconnect }: WalletNumWithMenuProps) => {
 	return (
 		<div className="top-16 w-56 text-right z-10">
 			<Menu as="div" className="relative inline-block text-left">
 				<MenuButton>
 					{address}
-					<ChevronDown/>
+					<ChevronDown />
 				</MenuButton>
 				<Transition
 					as={Fragment}

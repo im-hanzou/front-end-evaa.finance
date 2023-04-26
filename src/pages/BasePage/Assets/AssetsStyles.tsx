@@ -29,7 +29,7 @@ export const AssetsTitle = styled(MediumRobotoText)`
     font-size: 2.2rem;
     margin-bottom: 3rem;
     color: ${props => props.theme.black};
-    
+    display: flex; 
     @media only screen and (max-width: 480px) {
     }
 `
