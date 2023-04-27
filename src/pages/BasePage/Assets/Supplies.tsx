@@ -50,7 +50,7 @@ const Supplies = ({ tab }: SuppliesProps) => {
     const currentSupplies = tab === '1' ? supplies : [];
     const getTokens = () => {
         console.log()
-        fetch('http://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
+        fetch('https://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
             method: "POST",
             headers: {
                 Accept: "application/json, text/plain, */*",

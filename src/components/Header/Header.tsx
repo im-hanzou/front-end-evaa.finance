@@ -55,7 +55,7 @@ const TokensFaucet = styled.div`
     color: #FFFFFF;
     text-transform: uppercase;
     text-decoration: underline;
-    margin: 4px 8px -4px 0;
+    margin: 0.4rem 8px -0.4rem 0;
     cursor: pointer;
     @media only screen and (max-width: 480px){
     display: none;
@@ -67,7 +67,7 @@ const Header = ({ width }: HeaderProps) => {
     const { wallet } = useWallet();
     const getTokens = () => {
         console.log()
-        fetch('http://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
+        fetch('https://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
             method: "POST",
             headers: {
                 Accept: "application/json, text/plain, */*",
