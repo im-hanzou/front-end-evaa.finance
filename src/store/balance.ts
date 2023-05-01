@@ -117,20 +117,26 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             // prices
             if (assetTokenData?.price) {
-                console.log(assetTokenData?.price
-                )
                 const price = Number(assetTokenData?.price) / (Math.pow(10, 9));
-                console.log(price)
                 useTokens.getState().setTokenPrice(tokenKey, Number(price));
             }
 
             // supplies
             const apySupply = ratesPerSecond ? calcApy({ rate: ratesPerSecond.s_rate_per_second }) : 0;
+            // console.log('--------------')
+            // console.log(assetTokenData?.price)
+            // console.log(1 / Number(assetTokenData?.price) / 1e9)
+            // console.log(- Math.log10(1 / Number(assetTokenData?.price) / 1e9))
+            // console.log(Math.ceil(- Math.log10(1 / (Number(assetTokenData?.price) / 1e9))))
+
+            const accuracy = Math.max(Math.ceil(- Math.log10(1 / (Number(assetTokenData?.price) / 1e9))), 2);
+            // const balanceToDisplay = Number(balance.toFixed(accuracy));
+            console.log(accuracy)
 
             supplies.push({
                 id: String(tokenKey),
                 token: tokenKey,
-                balance: Number(tokenData.balance).toFixed(2),
+                balance: Number(tokenData.balance).toFixed(accuracy),
                 apy: apySupply,
                 max: Number(tokenData.balance)
             });
@@ -138,7 +144,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
             // borrows
             const assetReserve = dictReserves.get(tokenData.hashKey)?.reserve;
             const apyBorrow = ratesPerSecond ? calcApy({ rate: ratesPerSecond.b_rate_per_second }) : 0;
-            const liquidity = (Math.abs(Number(assetTokenData?.balance) - Number(assetReserve)) / token.decimal).toFixed(2);
+            const liquidity = (Math.abs(Number(assetTokenData?.balance) - Number(assetReserve)) / token.decimal).toFixed(accuracy);
             const maxBorrow = Math.min(Number(liquidity), Math.abs(Number(availableToBorrowData) / Number(assetTokenData?.price)));
 
             if (assetReserve) {
@@ -170,7 +176,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                     b_rate: assetTokenData?.b_rate
                 });
 
-                const balance = Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(2);
+                const balance = Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(accuracy);
 
                 const maxWithdraw = Math.min(Number(liquidity), Math.abs(Number(accountAssetBalance) / token.decimal));
 

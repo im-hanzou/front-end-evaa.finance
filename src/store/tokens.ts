@@ -68,6 +68,7 @@ export const TokenMap: TokenMapType = {
             return TON_JETTON_ADDRESS;
         },
         async getBalance(userAddress: Address) {
+
             return fromNano(await tonClient.getBalance(userAddress));
         }
     },
@@ -80,6 +81,7 @@ export const TokenMap: TokenMapType = {
             return await getAddressByTokenId(USDT_EVAA_ADDRESS, ownerAddress)
         },
         async getBalance(userAddress: Address) {
+
             return await getBalanceByTokenId(USDT_EVAA_ADDRESS, userAddress, this.decimal)
         }
     },
