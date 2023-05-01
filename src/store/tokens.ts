@@ -207,7 +207,6 @@ export const useTokens = create<TokenStore>((set, get) => {
         getPrice: (token, value = '') => {
             const tokenPrice = get().tokens[token]?.price || 0; // in case prices not loaded yet
             const usd = value ? parseFloat(value) * Number(tokenPrice) : 0;
-
             return usd;
         },
         formatToUsd: (token, value = '') => {

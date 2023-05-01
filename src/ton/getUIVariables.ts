@@ -30,12 +30,11 @@ export async function getUIVariables() {
             const totalBorrow = BigInt(src.loadUint(64));
             const lastAccural = BigInt(src.loadUint(32));
             const balance = BigInt(src.loadUint(64));
-
             return { price, s_rate, b_rate, totalSupply, totalBorrow, lastAccural, balance };
         }
         //@ts-ignore
     }, stack.readCellOpt());
-
+    console.log(assetDataDict)
     // 2 -----------POOL METADATA----
     //@ts-ignore
     const conf = stack.pop().cell.beginParse();

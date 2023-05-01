@@ -94,12 +94,12 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             const limitUsed = Number(borrowBalance);
             const availableToBorrow = (Math.abs(Number(availableToBorrowData)) / Math.pow(10, 9)).toFixed(2);
-            set({availableToBorrow});
+            set({ availableToBorrow });
 
             const totalLimit = limitUsed + Number(availableToBorrow);
 
             set({ borrowLimitValue: totalLimit });
-            
+
             if (totalLimit !== 0) {
                 const borrowLimitPercent = limitUsed / totalLimit;
                 set({ borrowLimitPercent });
@@ -117,8 +117,10 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             // prices
             if (assetTokenData?.price) {
-                const price = BigInt(assetTokenData?.price) / BigInt(Math.pow(10, 9));
-
+                console.log(assetTokenData?.price
+                )
+                const price = Number(assetTokenData?.price) / (Math.pow(10, 9));
+                console.log(price)
                 useTokens.getState().setTokenPrice(tokenKey, Number(price));
             }
 
@@ -149,7 +151,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 });
             }
 
-            if(dictReserves.get(tokenData.hashKey)?.reserve === undefined){ //delete after creating a stable on sc
+            if (dictReserves.get(tokenData.hashKey)?.reserve === undefined) { //delete after creating a stable on sc
                 borrows.push({
                     id: 'aa',
                     token: Token.TOS,
@@ -171,7 +173,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 const balance = Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(2);
 
                 const maxWithdraw = Math.min(Number(liquidity), Math.abs(Number(accountAssetBalance) / token.decimal));
-                
+
 
                 if (accountAssetBalance > 0) {
                     mySupplies.push({
