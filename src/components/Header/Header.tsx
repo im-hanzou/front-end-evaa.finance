@@ -1,12 +1,13 @@
-import React from 'react';
 import styled from 'styled-components';
 import { AuthButton } from '../../components/AuthButton/AuthButton';
 import { BoldRobotoText } from '../Texts/MainTexts';
 import EvaaLogo from '../../assets/pictures/evaa_logo.png'
-import { TonConnectButton } from '@tonconnect/ui-react';
 import { useNavigate } from 'react-router';
 import { Address } from 'ton'
 import { useWallet, Action } from '@/store/wallet';
+import { notification } from 'antd';
+import ExclamationCircleIcon from '@heroicons/react/20/solid/ExclamationCircleIcon';
+import RocketLaunchIcon from '@heroicons/react/20/solid/RocketLaunchIcon';
 export interface HeaderProps {
     width?: string;
 }
@@ -65,8 +66,9 @@ const TokensFaucet = styled.div`
 const Header = ({ width }: HeaderProps) => {
     const navigate = useNavigate();
     const { wallet } = useWallet();
+
+
     const getTokens = () => {
-        console.log()
         fetch('https://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
             method: "POST",
             headers: {
@@ -76,8 +78,17 @@ const Header = ({ width }: HeaderProps) => {
             body: JSON.stringify({
                 address: Address.parseRaw(wallet?.account.address ?? "").toString()
             })
-        }).then(e => e.json()).then(e => alert(JSON.stringify(e)))
+        }).then(e => e.json()).then(e => (JSON.stringify(e) === `{"status":"denied"}`) ? notification.open({
+            message: 'You can use the tokens faucet only once.',
+            description: 'Please, wait until tokens appear on your balance',
+            icon: <ExclamationCircleIcon color='red' width='32px' height='32px' />,
+        }) : notification.open({
+            message: 'You used the tokens faucet.',
+            description: 'The action will take some time to process, please do not worry',
+            icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
+        }))
     }
+
 
     return (
         <HeaderWrapper width={width}>
