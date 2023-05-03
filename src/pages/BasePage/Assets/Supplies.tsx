@@ -31,11 +31,11 @@ const TokensFaucet = styled.div`
     cursor: pointer;
     border-bottom: 2px solid #0381C5;
     font-style: normal;
-font-weight: 400;
-font-size: 13.0907px;
-line-height: 15px;
+    font-weight: 400;
+    font-size: 13.0907px;
+    line-height: 15px;
     @media only screen and (min-width: 480px){
-        display: none;
+    display: none;
     }
 `
 
@@ -49,7 +49,6 @@ const Supplies = ({ tab }: SuppliesProps) => {
     const currentMySupplies = tab === '1' ? mySupplies : [];
     const currentSupplies = tab === '1' ? supplies : [];
     const getTokens = () => {
-        console.log()
         fetch('https://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
             method: "POST",
             headers: {

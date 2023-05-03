@@ -8,7 +8,7 @@ export const SupplyDescriptionBar = ({} : AssetsDescriptionBarProps) => {
     return (
         <AssetsDescriptionBarWrapper>
             <AssetsDescriptionTextMobileHide>Asset</AssetsDescriptionTextMobileHide>
-            <AssetsDescriptionText right={42.5}>Wallet Balance</AssetsDescriptionText>
+            <AssetsDescriptionText right={40.5}>Wallet Balance</AssetsDescriptionText>
             <AssetsDescriptionTextMobileHide right={30.6}>APY</AssetsDescriptionTextMobileHide>
         </AssetsDescriptionBarWrapper>
     )
