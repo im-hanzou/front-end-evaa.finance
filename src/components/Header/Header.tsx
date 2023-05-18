@@ -45,23 +45,18 @@ const Image = styled.div`
 `
 const HeaderButtons = styled.div`
     display: flex;
-    flex-direction: column-reverse;
-    align-items: flex-end;
     @media only screen and (max-width: 480px){
         flex-direction: column-reverse;
     }
 `
 const TokensFaucet = styled.div`
-    color: ${props => props.theme.white};
-    background-color: #0381C5;
-    border: none;
-    border-radius: 5.3px;
-    padding: 0.7rem 1.9rem;
-    margin-top: 5px;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #fff;
-    font-style: normal;
+    font-weight: 400;
+    height: 1.5rem;
+    font-size: 1.5rem;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    text-decoration: underline;
+    margin: 0.4rem 8px -0.4rem 0;
     cursor: pointer;
 
     @media only screen and (max-width: 480px){
