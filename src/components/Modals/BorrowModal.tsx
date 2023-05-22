@@ -152,7 +152,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
 
     const click = async () => {
         try {
-            await sendTransaction(Number(tokenAmount).toFixed(9).toString(), currentToken, Action.borrow);
+            await sendTransaction(Number(tokenAmount).toFixed(8).toString(), currentToken, Action.borrow);
             
             notification.open({
                 message: 'Borrow is successful',
@@ -164,8 +164,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
 
             close();
 
-        } catch (e){
-            console.log("1111111111", e);
+        } catch {
             notification.open({
                 message: 'Transaction not completed',
                 description: 'The transaction was canceled by the user or another error occurred. Please, try again.',
