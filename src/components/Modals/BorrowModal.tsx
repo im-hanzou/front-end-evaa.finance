@@ -147,12 +147,12 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
     let borrowBalanceTotal = isMoreMax ? formatUsd(0) : 
         formatUsd(Math.abs(Number(availableToBorrow) - getPrice(currentToken, tokenAmount)));
 
-    const limitUsedTotal = isMoreMax ? formatPercent(1) : formatPercent(borrowLimitPercent + limitUsedPercent);
+    const limitUsedTotal = isMoreMax ? formatPercent(1) : formatPercent(borrowLimitPercent + limitUsedPercent ? limitUsedPercent : 0);
 
 
     const click = async () => {
         try {
-            await sendTransaction(tokenAmount, currentToken, Action.borrow);
+            await sendTransaction(Number(tokenAmount).toFixed(8).toString(), currentToken, Action.borrow);
             
             notification.open({
                 message: 'Borrow is successful',
@@ -180,7 +180,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
             <Title>Borrow {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' step='any' max={borrow?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' step='any' max={borrow?.max} maxLength={100} {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
