@@ -131,7 +131,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             const accuracy = Math.max(Math.ceil(- Math.log10(1 / (Number(assetTokenData?.price) / 1e9))), 2);
             // const balanceToDisplay = Number(balance.toFixed(accuracy));
-            console.log(accuracy)
+            // console.log(accuracy)
 
             supplies.push({
                 id: String(tokenKey),
@@ -142,11 +142,15 @@ export const useBalance = create<BalanceStore>((set, get) => {
             });
 
             // borrows
+            let maxBorrowMath = Math.abs(Number(availableToBorrowData) / Number(assetTokenData?.price));
+            if (Number(maxBorrowMath.toFixed(6)) === 0) { maxBorrowMath = 0 }; 
             const assetReserve = dictReserves.get(tokenData.hashKey)?.reserve;
             const apyBorrow = ratesPerSecond ? calcApy({ rate: ratesPerSecond.b_rate_per_second }) : 0;
             const liquidity = (Math.abs(Number(assetTokenData?.balance) - Number(assetReserve)) / token.decimal).toFixed(accuracy);
-            const maxBorrow = Math.min(Number(liquidity), Math.abs(Number(availableToBorrowData) / Number(assetTokenData?.price)));
-
+            const maxBorrow = Math.min(Number(liquidity), Number(maxBorrowMath));
+            console.log('-------------------');
+            console.log(availableToBorrowData, assetTokenData?.price, token.tokenId);
+            
             if (assetReserve) {
                 borrows.push({
                     id: String(tokenKey),
