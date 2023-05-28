@@ -10,6 +10,7 @@ import { getAggregatedBalances } from '@/ton/getAggregatedBalances';
 import { calcApy } from '@/ton/utils';
 
 import { Token, useTokens } from './tokens';
+import { abbrNum } from '@/utils';
 
 export interface MySupply {
     id: string;
@@ -136,7 +137,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
             supplies.push({
                 id: String(tokenKey),
                 token: tokenKey,
-                balance: Number(tokenData.balance).toFixed(accuracy),
+                balance: abbrNum(Number(tokenData.balance).toFixed(accuracy), 2),
                 apy: apySupply,
                 max: Number(tokenData.balance)
             });
@@ -148,8 +149,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
             const apyBorrow = ratesPerSecond ? calcApy({ rate: ratesPerSecond.b_rate_per_second }) : 0;
             const liquidity = (Math.abs(Number(assetTokenData?.balance) - Number(assetReserve)) / token.decimal).toFixed(accuracy);
             const maxBorrow = Math.min(Number(liquidity), Number(maxBorrowMath));
-            console.log('-------------------');
-            console.log(availableToBorrowData, assetTokenData?.price, token.tokenId);
+            
             
             if (assetReserve) {
                 borrows.push({
@@ -180,10 +180,9 @@ export const useBalance = create<BalanceStore>((set, get) => {
                     b_rate: assetTokenData?.b_rate
                 });
 
-                const balance = Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(accuracy);
+                const balance = abbrNum(Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(accuracy), 3);
 
                 const maxWithdraw = Math.min(Number(liquidity), Math.abs(Number(accountAssetBalance) / token.decimal));
-
 
                 if (accountAssetBalance > 0) {
                     mySupplies.push({
