@@ -180,7 +180,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                     b_rate: assetTokenData?.b_rate
                 });
 
-                const balance = abbrNum(Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(accuracy), 3);
+                const balance = abbrNum(Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(accuracy), 2);
 
                 const maxWithdraw = Math.min(Number(liquidity), Math.abs(Number(accountAssetBalance) / token.decimal));
 
@@ -196,7 +196,10 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 }
 
                 // myBorrows
-                const maxRepay = Math.min(Number(tokenData.balance), Number(Math.abs(Number(accountAssetBalance) / token.decimal))); //todo +t 
+                let maxRepayMath =  Number(Math.abs(Number(accountAssetBalance) / token.decimal));
+                if (Number(maxRepayMath.toFixed(6)) === 0) { maxRepayMath = 0 }; 
+                
+                const maxRepay = Math.min(Number(tokenData.balance), maxRepayMath ); //todo +t 
 
 
                 if (accountAssetBalance < 0) {
