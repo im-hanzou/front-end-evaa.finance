@@ -1,10 +1,8 @@
 import { create } from 'zustand';
-import { TonConnect, Wallet, isWalletInfoInjected, WalletInfoRemote } from '@tonconnect/sdk';
-import { BN } from 'bn.js'
+import { TonConnectUI, Wallet} from '@tonconnect/ui'
 import { fromNano, beginCell, toNano, Address } from 'ton';
 
 import { MASTER_EVAA_ADDRESS, USDT_EVAA_ADDRESS } from '@/config';
-import { isMobile, openLink, addReturnStrategy } from '@/utils';
 import { bufferToBigInt, friendlifyUserAddress } from '@/ton/utils';
 import { tonClient } from '@/ton/client';
 import { Minter } from '@/ton/minter';
@@ -26,7 +24,7 @@ interface AuthStore {
   universalLink: string;
   userAddress: string;
 
-  connector: TonConnect,
+  connector: TonConnectUI,
   wallet: Wallet | null,
 
   logout: () => void;
@@ -38,7 +36,12 @@ interface AuthStore {
 }
 
 export const useWallet = create<AuthStore>((set, get) => {
-  const connector = new TonConnect(dappMetadata);
+  // const connector = new TonConnect(dappMetadata);
+
+  const connector = new TonConnectUI({
+    manifestUrl: dappMetadata.manifestUrl,
+    // buttonRootId: 'ton-ui',
+});
 
   connector.onStatusChange((async (wallet) => {
     const userFriendlyAddress = friendlifyUserAddress(wallet?.account.address);
@@ -49,12 +52,8 @@ export const useWallet = create<AuthStore>((set, get) => {
     useTokens.getState().initTokens(userAddress);
   }), console.error);
 
-  connector.restoreConnection().then(() => {
-    set({ isLoading: false });
-  })
-
   return {
-    isLoading: true,
+    isLoading: false,
     isWaitingResponse: false,
     universalLink: '',
     userAddress: friendlifyUserAddress(connector?.wallet?.account.address),
@@ -76,28 +75,7 @@ export const useWallet = create<AuthStore>((set, get) => {
     ),
 
     login: async () => {
-      const walletsList = await connector.getWallets();
-      const embeddedWallet = walletsList.filter(isWalletInfoInjected).find((wallet) => wallet.embedded);
-      const tonkeeperConnectionWallet = walletsList.find((wallet) => wallet.name === "Tonkeeper") as WalletInfoRemote;
-
-      if (embeddedWallet) {
-        connector.connect({ jsBridgeKey: embeddedWallet.jsBridgeKey });
-        return;
-      }
-
-      const tonkeeperConnectionSource = {
-        universalLink: tonkeeperConnectionWallet.universalLink,
-        bridgeUrl: tonkeeperConnectionWallet.bridgeUrl,
-      };
-
-      const universalLink = connector.connect(tonkeeperConnectionSource) || '';
-
-      if (isMobile()) {
-        openLink(addReturnStrategy(universalLink, 'none'), '_blank');
-      } else {
-        set({ universalLink });
-      }
-
+      connector.connectWallet()
     },
 
     sendTransaction: async (amount: string, token: Token, action: Action) => {

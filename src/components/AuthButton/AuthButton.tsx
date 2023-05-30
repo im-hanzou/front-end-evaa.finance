@@ -13,7 +13,7 @@ export function AuthButton() {
 	const { t, i18n } = useTranslation();
 	const navigate = useNavigate();
 
-	const { login, logout, userAddress, universalLink, resetUniversalLink, isLoading } = useWallet();
+	const { login, logout, userAddress, isLoading } = useWallet();
 
 	if (isLoading) {
 		return <LoadingComponent />;
@@ -28,10 +28,6 @@ export function AuthButton() {
 			{!userAddress &&
 				<BlueButton onClick={login}>{t("basePage.addWallet")}</BlueButton>
 			}
-
-			<Dialog className={`w-full h-full fixed bg-black bg-opacity-50 top-0 flex justify-center items-center`} open={!!universalLink} onClose={resetUniversalLink}>
-				<QRModal close={resetUniversalLink} link={universalLink} />
-			</Dialog>
 		</>
 	);
 }
