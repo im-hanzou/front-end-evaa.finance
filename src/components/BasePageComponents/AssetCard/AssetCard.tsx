@@ -2,7 +2,7 @@ import { AssetCardLogo, AssetCardText, AssetCardTextMobileHide, AssetCardTextSim
 import { AssetCardButton } from '../../AssetCardButton';
 
 import { Token, useTokens, TokenMap } from '@/store/tokens';
-import { formatPercent } from '@/utils';
+import { formatPercent, formatValue } from '@/utils';
 
 export interface AssetCardProps {
     token: Token;
@@ -21,7 +21,7 @@ export const SupplyAssetCard = ({ onClick, token, balance, apy } : AssetCardProp
                 <AssetCardLogo src={TokenMap[token].icon}/>
                 <AssetCardTextSimple>{TokenMap[token].ticker}</AssetCardTextSimple>
             </AssetWrapper>
-            <AssetCardText right={42.5}>{balance} {TokenMap[token].ticker}</AssetCardText>
+            <AssetCardText right={42.5}>{formatValue(balance)} {TokenMap[token].ticker}</AssetCardText>
             <AssetCardTextMobileHide right={30.1}>{formatPercent(apy)}</AssetCardTextMobileHide>
             <AssetCardButton disabled={TokenMap[token].ticker === 'TOS'} onClick={onClick} right={0}>Supply</AssetCardButton>
         </AssetCardWrapper>
@@ -38,7 +38,7 @@ export const MySuppliesAssetCard = ({ onClick, token, balance, apy, earned } : A
                 <AssetCardTextSimple>{TokenMap[token].ticker}</AssetCardTextSimple>
             </AssetWrapper>
             <DoubleTextWrapper right={42.5}>
-                <DoubleTextUpper>{balance} {TokenMap[token].ticker}</DoubleTextUpper>
+                <DoubleTextUpper>{formatValue(balance)} {TokenMap[token].ticker}</DoubleTextUpper>
                 <DoubleTextLower>{formatToUsd(token, balance)}</DoubleTextLower>
             </DoubleTextWrapper>
             <DoubleTextWrapperMobileHide right={30.1}>
@@ -72,7 +72,7 @@ export const MyBorrowsAssetCard = ({ onClick, token, balance, apy, accrued} : As
                 <AssetCardTextSimple>{TokenMap[token].ticker}</AssetCardTextSimple>
             </AssetWrapper>
             <DoubleTextWrapper right={42.5}>
-                <DoubleTextUpper>{balance} {TokenMap[token].ticker}</DoubleTextUpper>
+                <DoubleTextUpper>{formatValue(balance)} {TokenMap[token].ticker}</DoubleTextUpper>
                 <DoubleTextLower>{formatToUsd(token, balance)}</DoubleTextLower>
             </DoubleTextWrapper>
             <DoubleTextWrapperMobileHide right={30.1}>

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { XMarkIcon, ExclamationCircleIcon, RocketLaunchIcon, ArrowLongRightIcon } from '@heroicons/react/20/solid';
 import { notification } from 'antd';
 
-import { formatPercent, formatUsd } from "@/utils";
+import { formatPercent, formatSmallValue, formatUsd } from "@/utils";
 import { Token, TokenMap, useTokens } from "@/store/tokens";
 import { useWallet, Action } from '@/store/wallet';
 import { MyBorrow, useBalance } from "@/store/balance";
@@ -190,7 +190,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{borrow?.max} {ticker}</InfoText>
+                        <InfoText>{formatSmallValue(borrow?.max || 0)} {ticker}</InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>

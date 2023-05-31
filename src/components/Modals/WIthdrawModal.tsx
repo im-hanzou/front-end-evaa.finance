@@ -11,6 +11,7 @@ import { MySupply, useBalance } from '@/store/balance';
 import ModalConfirmButton from "../ModalConfirmButton";
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 import { AmountInDollars } from "./SupplyModal";
+import { formatSmallValue } from "@/utils";
 
 const DialogStyled = styled(Dialog.Panel)`
     position: relative;
@@ -163,7 +164,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{supply?.max} {ticker}</InfoText>
+                        <InfoText>{formatSmallValue(supply?.max || 0)} {ticker}</InfoText>
                     </InfoTextWrapper>
                     {/* <InfoTextWrapper>
                             <InfoText>Supply APY</InfoText>

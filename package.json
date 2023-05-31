@@ -16,7 +16,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@tonconnect/protocol": "^2.0.0",
     "@tonconnect/sdk": "^2.0.5",
-    "@tonconnect/ui-react": "^0.0.6",
+    "@tonconnect/ui": "^1.0.0-beta.5",
     "@types/bn.js": "^5.1.1",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.3",

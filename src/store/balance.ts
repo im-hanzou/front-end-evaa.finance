@@ -10,7 +10,6 @@ import { getAggregatedBalances } from '@/ton/getAggregatedBalances';
 import { calcApy } from '@/ton/utils';
 
 import { Token, useTokens } from './tokens';
-import { abbrNum } from '@/utils';
 
 export interface MySupply {
     id: string;
@@ -137,14 +136,13 @@ export const useBalance = create<BalanceStore>((set, get) => {
             supplies.push({
                 id: String(tokenKey),
                 token: tokenKey,
-                balance: abbrNum(Number(tokenData.balance).toFixed(accuracy), 2),
+                balance: Number(tokenData.balance).toFixed(accuracy),
                 apy: apySupply,
                 max: Number(tokenData.balance)
             });
 
             // borrows
             let maxBorrowMath = Math.abs(Number(availableToBorrowData) / Number(assetTokenData?.price));
-            if (Number(maxBorrowMath.toFixed(6)) === 0) { maxBorrowMath = 0 }; 
             const assetReserve = dictReserves.get(tokenData.hashKey)?.reserve;
             const apyBorrow = ratesPerSecond ? calcApy({ rate: ratesPerSecond.b_rate_per_second }) : 0;
             const liquidity = (Math.abs(Number(assetTokenData?.balance) - Number(assetReserve)) / token.decimal).toFixed(accuracy);
@@ -180,7 +178,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
                     b_rate: assetTokenData?.b_rate
                 });
 
-                const balance = abbrNum(Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(accuracy), 2);
+                const balance = Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(accuracy);
 
                 const maxWithdraw = Math.min(Number(liquidity), Math.abs(Number(accountAssetBalance) / token.decimal));
 
@@ -197,7 +195,6 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
                 // myBorrows
                 let maxRepayMath =  Number(Math.abs(Number(accountAssetBalance) / token.decimal));
-                if (Number(maxRepayMath.toFixed(6)) === 0) { maxRepayMath = 0 }; 
                 
                 const maxRepay = Math.min(Number(tokenData.balance), maxRepayMath ); //todo +t 
 
