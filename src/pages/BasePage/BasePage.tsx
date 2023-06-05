@@ -31,6 +31,9 @@ const StyledTabs = styled(Tabs)`
   .ant-tabs-tab:hover {
     color: #0381C5;
   }
+  .ant-tabs-nav {
+    position: unset;
+  }
 `
 
 
