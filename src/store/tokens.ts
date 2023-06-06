@@ -53,7 +53,7 @@ const getBalanceByTokenId = async (tokenAddress: Address, userAddress: Address, 
         const juserwalletEvaaMasterSC1 = await tonClient.open(contract1).getBalance()
         usdtBalance = String(juserwalletEvaaMasterSC1.readNumber() / decimal);
     } catch (e) {
-        console.log('error with get usdtBalance', e)
+        console.log('error with get getBalanceByTokenId', e)
     }
     return usdtBalance;
 }

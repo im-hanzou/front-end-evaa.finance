@@ -26,8 +26,8 @@ export async function getAccountAssetBalance({ userContractAddress, address, s_r
 
         accountAssetBalance = BigInt(accountAssetBalanceUsdt.stack.readNumber());
         
-    } catch (e) {
-        console.log('error with getAccountAssetBalance', e)
+    } catch {
+        console.info(`balance for ${address.toString()} is loading`)
     }
 
     return accountAssetBalance;

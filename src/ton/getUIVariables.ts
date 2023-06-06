@@ -34,7 +34,6 @@ export async function getUIVariables() {
         }
         //@ts-ignore
     }, stack.readCellOpt());
-    console.log(assetDataDict)
     // 2 -----------POOL METADATA----
     //@ts-ignore
     const conf = stack.pop().cell.beginParse();

@@ -123,15 +123,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             // supplies
             const apySupply = ratesPerSecond ? calcApy({ rate: ratesPerSecond.s_rate_per_second }) : 0;
-            // console.log('--------------')
-            // console.log(assetTokenData?.price)
-            // console.log(1 / Number(assetTokenData?.price) / 1e9)
-            // console.log(- Math.log10(1 / Number(assetTokenData?.price) / 1e9))
-            // console.log(Math.ceil(- Math.log10(1 / (Number(assetTokenData?.price) / 1e9))))
-
             const accuracy = Math.max(Math.ceil(- Math.log10(1 / (Number(assetTokenData?.price) / 1e9))), 2);
-            // const balanceToDisplay = Number(balance.toFixed(accuracy));
-            // console.log(accuracy)
 
             supplies.push({
                 id: String(tokenKey),

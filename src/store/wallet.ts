@@ -84,9 +84,6 @@ export const useWallet = create<AuthStore>((set, get) => {
       const nanoAmount = BigInt(Number(amount) * TokenMap[token].decimal);
       const address = MASTER_EVAA_ADDRESS.toString();
 
-      console.log('----------------------')
-      console.log(address, amount, nanoAmount, token, action)
-      console.log('----------------------')
       let messages = [];
 
       if (action === Action.withdraw || action === Action.borrow) {
