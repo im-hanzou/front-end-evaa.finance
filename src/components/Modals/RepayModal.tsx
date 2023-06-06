@@ -142,6 +142,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
 
     const tokenAmount = watch("price");
     const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
+    const isMoreMin = Number(tokenAmount) < 1e-18;
 
     let limitUsedPercent = isMoreMax ?  borrowLimitPercent :
         getPrice(currentToken, tokenAmount) * borrowLimitPercent / borrowBalance;
@@ -182,7 +183,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
             <Title>Repay {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' step='any' max={borrow?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' step='any' min={1e-18} max={borrow?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch('price'))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -202,7 +203,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount} onClick={click}>Repay</ModalBtn>
+            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount || isMoreMin} onClick={click}>Repay</ModalBtn>
         </Dialog.Panel>
     )
 }

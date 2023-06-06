@@ -162,6 +162,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
     }
 
     const isMoreMax = Number(tokenAmount) > (supply?.max || 0);
+    const isMoreMin = Number(tokenAmount) < 1e-18;
 
     return (
         <Dialog.Panel as={DialogStyled}>
@@ -169,7 +170,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
             <Title>Supply {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' step='any' max={supply?.max} maxLength={7} {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' step='any' min={1e-18} max={supply?.max} maxLength={7} {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -185,7 +186,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount} onClick={click}>Supply</ModalBtn>
+            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount || isMoreMin} onClick={click}>Supply</ModalBtn>
         </Dialog.Panel>
     )
 }
