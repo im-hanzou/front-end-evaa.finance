@@ -60,8 +60,6 @@ export function formatLargeValue(number: any, decPlaces: number) {
 }
 
 export function formatValue(value: any) {
-    // return value;
-    // return (value < 0.00001 ) ? '≤0.00001' : formatLargeValue(value, 2) ;
     return value == 0 ? value :
-        (value > 0.0001) ? formatLargeValue(value, 2) : '≤0.0001';
+        (value > 0.0001) ? formatLargeValue(value, 2) : '<0.0001';
 }

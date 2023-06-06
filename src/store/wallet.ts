@@ -2,10 +2,8 @@ import { create } from 'zustand';
 import { TonConnectUI, Wallet} from '@tonconnect/ui'
 import { fromNano, beginCell, toNano, Address } from 'ton';
 
-import { MASTER_EVAA_ADDRESS, USDT_EVAA_ADDRESS } from '@/config';
-import { bufferToBigInt, friendlifyUserAddress } from '@/ton/utils';
-import { tonClient } from '@/ton/client';
-import { Minter } from '@/ton/minter';
+import { MASTER_EVAA_ADDRESS } from '@/config';
+import { friendlifyUserAddress } from '@/ton/utils';
 
 import { Token, TokenMap, useTokens } from './tokens';
 
@@ -19,6 +17,7 @@ export enum Action {
 }
 
 interface AuthStore {
+  isLogged: boolean;
   isLoading: boolean;
   isWaitingResponse: boolean;
   universalLink: string;
@@ -36,12 +35,10 @@ interface AuthStore {
 }
 
 export const useWallet = create<AuthStore>((set, get) => {
-  // const connector = new TonConnect(dappMetadata);
+  const connector = new TonConnectUI(dappMetadata);
 
-  const connector = new TonConnectUI({
-    manifestUrl: dappMetadata.manifestUrl,
-    // buttonRootId: 'ton-ui',
-});
+  // @ts-ignore
+  const isLogged = !!connector.walletInfoStorage.localStorage[connector.walletInfoStorage.storageKey];
 
   connector.onStatusChange((async (wallet) => {
     const userFriendlyAddress = friendlifyUserAddress(wallet?.account.address);
@@ -53,6 +50,7 @@ export const useWallet = create<AuthStore>((set, get) => {
   }), console.error);
 
   return {
+    isLogged,
     isLoading: false,
     isWaitingResponse: false,
     universalLink: '',

@@ -6,7 +6,7 @@ import { Address } from "ton"
 import { useBalance, MySupply, Supply } from '@/store/balance';
 import { useWallet } from '@/store/wallet';
 
-import { MySuppliesAssetCard, SupplyAssetCard } from '../../../components/BasePageComponents/AssetCard/AssetCard';
+import { AssetCardSkeleton, MySuppliesAssetCard, SupplyAssetCard } from '../../../components/BasePageComponents/AssetCard/AssetCard';
 import styled from 'styled-components';
 import { MySuppliesDescriptionBar, SupplyDescriptionBar } from '../../../components/BasePageComponents/AssetsDescriptionBar/AssetsDescriptionBar';
 import { SupplyModal } from '../../../components/Modals/SupplyModal';
@@ -43,7 +43,7 @@ const TokensFaucet = styled.div`
 const Supplies = ({ tab }: SuppliesProps) => {
     const [api, contextHolder] = notification.useNotification();
     const { wallet, callIfLoged: callIfLogin } = useWallet();
-    const { mySupplies, supplies } = useBalance();
+    const { mySupplies, supplies, isReady } = useBalance();
     const [selectedMySupply, setSelectedMySupply] = useState<MySupply | undefined>();
     const [selectedSupply, setSelectedSupply] = useState<Supply | undefined>();
     const currentMySupplies = tab === '1' ? mySupplies : [];
@@ -76,15 +76,18 @@ const Supplies = ({ tab }: SuppliesProps) => {
                     <AssetsTitle>Your Supplies
 
                     </AssetsTitle>
-                    {currentMySupplies.length > 0 &&
+                    {(!isReady || currentMySupplies.length > 0) &&
                         <MySuppliesDescriptionBar />
                     }
-                    {!currentMySupplies.length &&
+                    {isReady && !currentMySupplies.length &&
                         <AssetsSubtitle>Nothing supplied yet</AssetsSubtitle>
                     }
                     {currentMySupplies.map(mySupply => (
                         <MySuppliesAssetCard {...mySupply} key={mySupply.id} onClick={callIfLogin(() => setSelectedMySupply(mySupply))} />
                     ))}
+                    {!isReady &&
+                        <AssetCardSkeleton />
+                    }
 
                 </AssetsSubWrapper>
                 <AssetsSubWrapper>

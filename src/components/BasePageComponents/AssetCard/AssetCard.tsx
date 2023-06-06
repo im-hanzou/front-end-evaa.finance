@@ -1,5 +1,6 @@
 import { AssetCardLogo, AssetCardText, AssetCardTextMobileHide, AssetCardTextSimple, AssetCardWrapper, AssetWrapper, DoubleTextLower, DoubleTextUpper, DoubleTextWrapper, DoubleTextWrapperMobileHide } from './AssetCardStyles';
 import { AssetCardButton } from '../../AssetCardButton';
+import { Skeleton } from 'antd';
 
 import { Token, useTokens, TokenMap } from '@/store/tokens';
 import { formatPercent, formatValue } from '@/utils';
@@ -85,3 +86,12 @@ export const MyBorrowsAssetCard = ({ onClick, token, balance, apy, accrued} : As
     )
 }
 
+export const AssetCardSkeleton = () => {    
+    return (
+        <AssetCardWrapper>
+            <Skeleton.Avatar active style={{ position: 'absolute', left: 0 }} />
+            <Skeleton.Button active block style={{ position: 'absolute', left: '6rem', right: '15rem', width: 'initial' }} />
+            <Skeleton.Button active style={{ position: 'absolute', right: 0, width: '12rem' }} />
+        </AssetCardWrapper>
+    )
+}

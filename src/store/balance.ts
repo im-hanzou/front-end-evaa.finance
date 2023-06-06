@@ -10,6 +10,7 @@ import { getAggregatedBalances } from '@/ton/getAggregatedBalances';
 import { calcApy } from '@/ton/utils';
 
 import { Token, useTokens } from './tokens';
+import { useWallet } from './wallet';
 
 export interface MySupply {
     id: string;
@@ -63,17 +64,17 @@ interface BalanceStore {
     initBalance: (userAddress?: Address) => void;
     isInitedUser: boolean;
     isLoading: boolean;
+    isReady: boolean;
 }
 
 export const useBalance = create<BalanceStore>((set, get) => {
     const initBalance = async (userAddress?: Address) => {
         if (userAddress) {
-            set({ userAddress })
+            set({ userAddress, isReady: false })
         }
 
         updateData();
     }
-
 
     const updateData = async () => {
         const { assetDataDict, assetConfigDict, dictRates, dictReserves } = await getUIVariables();
@@ -140,7 +141,6 @@ export const useBalance = create<BalanceStore>((set, get) => {
             const liquidity = (Math.abs(Number(assetTokenData?.balance) - Number(assetReserve)) / token.decimal).toFixed(accuracy);
             const maxBorrow = Math.min(Number(liquidity), Number(maxBorrowMath));
             
-            
             if (assetReserve) {
                 borrows.push({
                     id: String(tokenKey),
@@ -205,7 +205,9 @@ export const useBalance = create<BalanceStore>((set, get) => {
             }
         });
 
-        set({ supplies, borrows, mySupplies, myBorrows, isLoading: false });
+        const isReady = (get()?.userAddress?.toString() && useWallet.getState().isLogged) || !useWallet.getState().isLogged;
+
+        set({ supplies, borrows, mySupplies, myBorrows, isLoading: false, isReady });
     }
 
     setInterval(updateData, UPDATE_INTERVAL);
@@ -225,5 +227,6 @@ export const useBalance = create<BalanceStore>((set, get) => {
         initBalance,
         isInitedUser: false,
         isLoading: true,
+        isReady: true
     }
 });
