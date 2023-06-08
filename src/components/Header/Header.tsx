@@ -83,8 +83,7 @@ const Header = ({ width }: HeaderProps) => {
                 address: Address.parseRaw(wallet?.account.address ?? "").toString()
             })
         }).then(e => e.json()).then(e => (JSON.stringify(e) === `{"status":"denied"}`) ? notification.open({
-            message: 'You can use the tokens faucet only once.',
-            description: 'Please, wait until tokens appear on your balance',
+            message: 'You has already collected testnet tokens. You are only allowed to do this once.',
             icon: <ExclamationCircleIcon color='red' width='32px' height='32px' />,
         }) : notification.open({
             message: 'You used the tokens faucet.',

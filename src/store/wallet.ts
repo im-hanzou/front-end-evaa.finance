@@ -81,7 +81,6 @@ export const useWallet = create<AuthStore>((set, get) => {
       const jettonAddress = useTokens.getState().tokens[token]?.address as Address;
       const nanoAmount = BigInt(Number(amount) * TokenMap[token].decimal);
       const address = MASTER_EVAA_ADDRESS.toString();
-
       let messages = [];
 
       if (action === Action.withdraw || action === Action.borrow) {
@@ -106,7 +105,7 @@ export const useWallet = create<AuthStore>((set, get) => {
 
           messages.push({
             address,
-            amount: nanoAmount.toString(),
+            amount: (nanoAmount + toNano('0.1333')).toString(),
             payload: body.toBoc().toString('base64'),
           })
         } else {
