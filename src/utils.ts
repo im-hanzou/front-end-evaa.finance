@@ -59,7 +59,8 @@ export function formatLargeValue(number: any, decPlaces: number) {
     return number;
 }
 
+
 export function formatValue(value: any) {
     return value == 0 ? value :
-        (value > 0.0001) ? formatLargeValue(value, 2) : '<0.0001';
+        (value > 0.01) ? formatLargeValue(value, 2) : '<0.01';
 }

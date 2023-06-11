@@ -171,7 +171,8 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 });
 
                 const balanceMath = Math.abs(Number(accountAssetBalance) / token.decimal);
-                const balance = balanceMath > 0.001 ? balanceMath.toFixed(accuracy) : balanceMath.toString();
+                const balance = balanceMath > 0.01 ? balanceMath.toFixed(accuracy) : balanceMath.toString();
+                
 
                 const maxWithdraw = Math.min(Number(liquidity), Math.abs(Number(accountAssetBalance) / token.decimal));
 
