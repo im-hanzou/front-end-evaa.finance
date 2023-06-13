@@ -6,7 +6,7 @@ import { tonClient } from "./client";
 import { hexToString } from "./utils";
 
 export async function getUIVariables() {
-    let { stack } = await tonClient.runMethod(
+    let { stack } = await (await tonClient()).runMethod(
         MASTER_EVAA_ADDRESS,
         'getUIVariables',
     );

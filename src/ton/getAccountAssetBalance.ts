@@ -18,7 +18,7 @@ export async function getAccountAssetBalance({ userContractAddress, address, s_r
     let accountAssetBalance = BigInt(0);
 
     try {
-        const accountAssetBalanceUsdt = await tonClient.runMethod(
+        const accountAssetBalanceUsdt = await (await tonClient()).runMethod(
             userContractAddress,
             'getAccountAssetBalance',
             argsUser.build(),

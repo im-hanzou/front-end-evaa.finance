@@ -28,7 +28,7 @@ export async function getAggregatedBalances({ userContractAddress, assetDataDict
     let isInitedUser = false;
 
     try {
-        const getAggregatedBalances = await tonClient.runMethod(
+        const getAggregatedBalances = await (await tonClient()).runMethod(
             userContractAddress,
             'getAggregatedBalances',
             argsUserBalanceas.build(),
