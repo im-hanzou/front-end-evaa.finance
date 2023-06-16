@@ -78,8 +78,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
     const updateData = async () => {
         const { assetDataDict, assetConfigDict, dictRates, dictReserves } = await getUIVariables();
-
-        const userContractAddress = getUserContractAddress(get().userAddress);
+        const userContractAddress = getUserContractAddress(get()?.userAddress);
         const { aggregatedBalance1, aggregatedBalance2, isInitedUser } = !get().userAddress ? { aggregatedBalance1: BigInt(0), aggregatedBalance2: BigInt(0), isInitedUser: false } : await getAggregatedBalances({ userContractAddress, assetConfigDict, assetDataDict });
         set({ isInitedUser });
 
@@ -140,7 +139,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
             const apyBorrow = ratesPerSecond ? calcApy({ rate: ratesPerSecond.b_rate_per_second }) : 0;
             const liquidity = (Math.abs(Number(assetTokenData?.balance) - Number(assetReserve)) / token.decimal).toFixed(accuracy);
             const maxBorrow = Math.min(Number(liquidity), Number(maxBorrowMath));
-            
+
             if (assetReserve) {
                 borrows.push({
                     id: String(tokenKey),
@@ -169,13 +168,14 @@ export const useBalance = create<BalanceStore>((set, get) => {
                     s_rate: assetTokenData?.s_rate,
                     b_rate: assetTokenData?.b_rate
                 });
-
                 const balanceMath = Math.abs(Number(accountAssetBalance) / token.decimal);
                 const balance = balanceMath > 0.01 ? balanceMath.toFixed(accuracy) : balanceMath.toString();
-                
+
 
                 const maxWithdraw = Math.min(Number(liquidity), Math.abs(Number(accountAssetBalance) / token.decimal));
 
+                console.log(accountAssetBalance)
+                console.log(balanceMath)
                 if (accountAssetBalance > 0) {
                     mySupplies.push({
                         id: String(tokenKey),
@@ -188,9 +188,9 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 }
 
                 // myBorrows
-                let maxRepayMath =  Number(Math.abs(Number(accountAssetBalance) / token.decimal));
-                
-                const maxRepay = Math.min(Number(tokenData.balance), maxRepayMath ); //todo +t 
+                let maxRepayMath = Number(Math.abs(Number(accountAssetBalance) / token.decimal));
+
+                const maxRepay = Math.min(Number(tokenData.balance), maxRepayMath); //todo +t 
 
 
                 if (accountAssetBalance < 0) {

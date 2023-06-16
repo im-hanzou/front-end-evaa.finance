@@ -1,5 +1,6 @@
 import { Address, TupleBuilder } from "ton";
 
+import { bufferToBigInt } from '@/ton/utils';
 import { tonClient } from "./client";
 
 interface getAccountAssetBalanceProps {
@@ -11,7 +12,7 @@ interface getAccountAssetBalanceProps {
 
 export async function getAccountAssetBalance({ userContractAddress, address, s_rate, b_rate }: getAccountAssetBalanceProps): Promise<bigint> {
     const argsUser = new TupleBuilder();
-    argsUser.writeAddress(address);
+    argsUser.writeNumber(bufferToBigInt(address.hash));
     argsUser.writeNumber(s_rate);
     argsUser.writeNumber(b_rate);
 
@@ -23,11 +24,12 @@ export async function getAccountAssetBalance({ userContractAddress, address, s_r
             'getAccountAssetBalance',
             argsUser.build(),
         );
-
+        // console.log(accountAssetBalanceUsdt)
+        //
         accountAssetBalance = BigInt(accountAssetBalanceUsdt.stack.readNumber());
-        
+
     } catch {
-        // console.info(`user balance for ${address.toString()} not present`)
+        console.info(`user balance for ${address.toString()} not present`)
     }
 
     return accountAssetBalance;

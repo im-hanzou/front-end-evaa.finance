@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { TonConnectUI, Wallet} from '@tonconnect/ui'
+import { TonConnectUI, Wallet } from '@tonconnect/ui'
 import { fromNano, beginCell, toNano, Address } from 'ton';
 
 import { MASTER_EVAA_ADDRESS } from '@/config';
@@ -93,7 +93,7 @@ export const useWallet = create<AuthStore>((set, get) => {
 
         messages.push({
           address,
-          amount: toNano('0.333').toString(),
+          amount: toNano('0.433').toString(),
           payload: body.toBoc().toString('base64'),
         });
       }
@@ -105,7 +105,7 @@ export const useWallet = create<AuthStore>((set, get) => {
 
           messages.push({
             address,
-            amount: (nanoAmount + toNano('0.1333')).toString(),
+            amount: (nanoAmount + toNano('0.21')).toString(),
             payload: body.toBoc().toString('base64'),
           })
         } else {
@@ -120,13 +120,13 @@ export const useWallet = create<AuthStore>((set, get) => {
             .storeAddress(MASTER_EVAA_ADDRESS)
             .storeAddress(null) //responce add?
             .storeDict(null)
-            .storeCoins(toNano('0.1333'))
+            .storeCoins(toNano('0.2333'))
             .storeMaybeRef(null) //tons to be forwarded
             .endCell()
 
           messages.push({
             address: userJettonWalletAddress.toString(),
-            amount: toNano('0.222').toString(),
+            amount: toNano('0.333').toString(),
             payload: body.toBoc().toString('base64'),
           })
         }
