@@ -148,7 +148,17 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
     let borrowBalanceTotal = isMoreMax ? formatUsd(0) : 
         formatUsd(Math.abs(Number(availableToBorrow) - getPrice(currentToken, tokenAmount)));
 
-    const limitUsedTotal = isMoreMax ? formatPercent(1) : formatPercent(borrowLimitPercent + limitUsedPercent ? limitUsedPercent : 0);
+    let limitUsedTotal;   
+    if (Number.isNaN(limitUsedPercent)) {
+        limitUsedTotal = formatPercent(getPrice(currentToken, tokenAmount) / Number(availableToBorrow))
+    } else {
+        limitUsedTotal = formatPercent(borrowLimitPercent + limitUsedPercent);
+    }
+
+    if (isMoreMax) {
+        limitUsedTotal = formatPercent(1)
+    }
+
 
 
     const click = async () => {
