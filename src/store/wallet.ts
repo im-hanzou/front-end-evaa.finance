@@ -105,7 +105,7 @@ export const useWallet = create<AuthStore>((set, get) => {
 
           messages.push({
             address,
-            amount: (nanoAmount + toNano('0.21')).toString(),
+            amount: (nanoAmount + toNano('0.143')).toString(),
             payload: body.toBoc().toString('base64'),
           })
         } else {
@@ -140,6 +140,7 @@ export const useWallet = create<AuthStore>((set, get) => {
           messages
         });
 
+        // await connector.sendTransaction.provider()
         set({ isWaitingResponse: false });
 
       } catch (e) {
