@@ -148,7 +148,8 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
                 icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
             });
 
-            useBalance.getState().initBalance();
+            // useBalance.getState().initBalance();
+            useBalance.getState().updateData();
 
             close();
 
