@@ -1,5 +1,5 @@
 import Header from '../../components/Header/Header';
-import { BasePageContainer, ContentWrapper, TestnetInfo, TestnetMinor } from './BasePageStyles';
+import { BasePageContainer, ContentWrapper, TestnetInfo, TestnetMinor, TestnetHeader, TestnetHeaderInfo, TestnetHeaderGuide } from './BasePageStyles';
 import InfoBar from '../../components/BasePageComponents/InfoBar/InfoBar';
 import Supplies from './Assets/Supplies';
 import Borrows from './Assets/Borrows';
@@ -8,7 +8,13 @@ import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 import styled from 'styled-components';
 import { useState } from 'react';
-import { BoldRobotoText } from '../../components/Texts/MainTexts';
+import { useWallet, Action } from '@/store/wallet';
+import { notification } from 'antd';
+import { Address } from 'ton'
+import ExclamationCircleIcon from '@heroicons/react/20/solid/ExclamationCircleIcon';
+import RocketLaunchIcon from '@heroicons/react/20/solid/RocketLaunchIcon';
+
+
 
 
 const StyledTabs = styled(Tabs)`
@@ -61,13 +67,40 @@ const mobileItems: TabsProps['items'] = [
 ];
 
 
+
 const BasePage = () => {
   const [ tab, setTab ] = useState('1');
   const isMobile = window.innerWidth < 480;
+  const { wallet } = useWallet();
+
+
+  const getTokens = () => {
+    fetch('https://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
+        method: "POST",
+        headers: {
+            Accept: "application/json, text/plain, */*",
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            address: Address.parseRaw(wallet?.account.address ?? "").toString()
+        })
+    }).then(e => e.json()).then(e => (JSON.stringify(e) === `{"status":"denied"}`) ? notification.open({
+        message: 'You has already collected testnet tokens. You are only allowed to do this once.',
+        icon: <ExclamationCircleIcon color='red' width='32px' height='32px' />,
+    }) : notification.open({
+        message: 'You used the tokens faucet.',
+        description: 'The action will take some time to process, please do not worry',
+        icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
+    }))
+}
+
 
   return (
     <BasePageContainer>
-        <TestnetInfo><TestnetMinor>Configure your wallet for use with the</TestnetMinor> TESTNET</TestnetInfo>
+        <TestnetHeader>
+          <TestnetHeaderInfo onClick={getTokens}>JOIN TEST NET - GET AIRDROP</TestnetHeaderInfo>
+          <TestnetHeaderGuide onClick={() => window.open("https://t.me/evaaprotocol/26")}>Guide</TestnetHeaderGuide>
+        </TestnetHeader>
         <Header />
         <InfoBar />
         <StyledTabs centered={isMobile} defaultActiveKey="1" items={isMobile ? mobileItems : items} onChange={setTab} />

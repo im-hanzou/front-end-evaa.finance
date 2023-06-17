@@ -75,3 +75,35 @@ export const MobileInfo = styled(BoldRobotoText)`
     margin: 3rem;
     margin-top: 15rem;
 `
+
+export const TestnetHeader = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 42px;
+    left: 0px;
+    top: 0px;
+    background-color: #0381C5;
+`
+export const TestnetHeaderInfo = styled.button`
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16.1115px;
+    line-height: 24px;
+    color: white;
+`
+export const TestnetHeaderGuide = styled.button`
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 22px;
+    margin-left: 20px;
+
+    text-decoration-line: underline;
+    text-transform: uppercase;
+    color: #FFFFFF;
+
+`

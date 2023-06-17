@@ -48,19 +48,6 @@ const Supplies = ({ tab }: SuppliesProps) => {
     const [selectedSupply, setSelectedSupply] = useState<Supply | undefined>();
     const currentMySupplies = tab === '1' ? mySupplies : [];
     const currentSupplies = tab === '1' ? supplies : [];
-    const getTokens = () => {
-        fetch('https://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
-            method: "POST",
-            headers: {
-                Accept: "application/json, text/plain, */*",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                address: Address.parseRaw(wallet?.account.address ?? "").toString()
-            })
-        }).then(e => e.json()).then(e => alert(JSON.stringify(e)))
-    }
-
 
     return (
         <>
@@ -92,7 +79,6 @@ const Supplies = ({ tab }: SuppliesProps) => {
                 </AssetsSubWrapper>
                 <AssetsSubWrapper>
                     <AssetsTitle>Supply
-                        <TokensFaucet onClick={getTokens}>get testnet tokens</TokensFaucet >
 
 
                     </AssetsTitle>
