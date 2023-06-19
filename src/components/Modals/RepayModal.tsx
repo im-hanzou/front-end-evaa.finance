@@ -159,7 +159,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
             
             notification.open({
                 message: 'Repay is successful',
-                description: 'The transaction will take about 30 seconds to process, please do not worry',
+                description: 'The transaction will take about 30 seconds to process, please wait',
                 icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
                 duration: 60,
             });
