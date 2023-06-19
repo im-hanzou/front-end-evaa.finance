@@ -62,6 +62,7 @@ interface BalanceStore {
     // support
     userAddress?: Address;
     initBalance: (userAddress?: Address) => void;
+    updateData: () => void;
     isInitedUser: boolean;
     isLoading: boolean;
     isReady: boolean;
@@ -174,8 +175,6 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
                 const maxWithdraw = Math.min(Number(liquidity), Math.abs(Number(accountAssetBalance) / token.decimal));
 
-                console.log(accountAssetBalance)
-                console.log(balanceMath)
                 if (accountAssetBalance > 0) {
                     mySupplies.push({
                         id: String(tokenKey),
@@ -226,6 +225,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
         borrows: [],
 
         initBalance,
+        updateData,
         isInitedUser: false,
         isLoading: true,
         isReady: true

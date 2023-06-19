@@ -148,7 +148,17 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
     let borrowBalanceTotal = isMoreMax ? formatUsd(0) : 
         formatUsd(Math.abs(Number(availableToBorrow) - getPrice(currentToken, tokenAmount)));
 
-    const limitUsedTotal = isMoreMax ? formatPercent(1) : formatPercent(borrowLimitPercent + limitUsedPercent ? limitUsedPercent : 0);
+    let limitUsedTotal;   
+    if (Number.isNaN(limitUsedPercent)) {
+        limitUsedTotal = formatPercent(getPrice(currentToken, tokenAmount) / Number(availableToBorrow))
+    } else {
+        limitUsedTotal = formatPercent(borrowLimitPercent + limitUsedPercent);
+    }
+
+    if (isMoreMax) {
+        limitUsedTotal = formatPercent(1)
+    }
+
 
 
     const click = async () => {
@@ -157,11 +167,13 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
             
             notification.open({
                 message: 'Borrow is successful',
-                description: 'The transaction will take some time to process, please do not worry',
+                description: 'The transaction will take about 30 seconds to process, please wait',
                 icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
+                duration: 60,
             });
             
-            useBalance.getState().initBalance();
+            // useBalance.getState().initBalance();
+            useBalance.getState().updateData();
 
             close();
 

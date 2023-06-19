@@ -3,12 +3,13 @@ import { AuthButton } from '../../components/AuthButton/AuthButton';
 import { BoldRobotoText } from '../Texts/MainTexts';
 import EvaaLogo from '../../assets/pictures/evaa_logo.png'
 import { useNavigate } from 'react-router';
-import { Address } from 'ton'
 import { useWallet, Action } from '@/store/wallet';
+import { Address } from 'ton'
 import { notification } from 'antd';
 import ExclamationCircleIcon from '@heroicons/react/20/solid/ExclamationCircleIcon';
 import RocketLaunchIcon from '@heroicons/react/20/solid/RocketLaunchIcon';
 import ModalConfirmButton from '../ModalConfirmButton';
+
 export interface HeaderProps {
     width?: string;
 }
@@ -91,6 +92,7 @@ const Header = ({ width }: HeaderProps) => {
             icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
         }))
     }
+
 
 
     return (

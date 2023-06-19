@@ -24,8 +24,6 @@ export async function getAccountAssetBalance({ userContractAddress, address, s_r
             'getAccountAssetBalance',
             argsUser.build(),
         );
-        // console.log(accountAssetBalanceUsdt)
-        //
         accountAssetBalance = BigInt(accountAssetBalanceUsdt.stack.readNumber());
 
     } catch {
