@@ -77,6 +77,7 @@ export const MobileInfo = styled(BoldRobotoText)`
 `
 
 export const TestnetHeader = styled.div`
+    font-family: 'Roboto';
     display: flex;
     align-items: center;
     justify-content: center;
