@@ -3,6 +3,13 @@ import { AuthButton } from '../../components/AuthButton/AuthButton';
 import { BoldRobotoText } from '../Texts/MainTexts';
 import EvaaLogo from '../../assets/pictures/evaa_logo.png'
 import { useNavigate } from 'react-router';
+import { useWallet, Action } from '@/store/wallet';
+import { Address } from 'ton'
+import { notification } from 'antd';
+import ExclamationCircleIcon from '@heroicons/react/20/solid/ExclamationCircleIcon';
+import RocketLaunchIcon from '@heroicons/react/20/solid/RocketLaunchIcon';
+import ModalConfirmButton from '../ModalConfirmButton';
+
 export interface HeaderProps {
     width?: string;
 }
@@ -64,6 +71,29 @@ const TokensFaucet = styled.div`
 
 const Header = ({ width }: HeaderProps) => {
     const navigate = useNavigate();
+    const { wallet } = useWallet();
+
+    const getTokens = () => {
+        fetch('https://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
+            method: "POST",
+            headers: {
+                Accept: "application/json, text/plain, */*",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                address: Address.parseRaw(wallet?.account.address ?? "").toString()
+            })
+        }).then(e => e.json()).then(e => (JSON.stringify(e) === `{"status":"denied"}`) ? notification.open({
+            message: 'You has already collected testnet tokens. You are only allowed to do this once.',
+            icon: <ExclamationCircleIcon color='red' width='32px' height='32px' />,
+        }) : notification.open({
+            message: 'You used the tokens faucet.',
+            description: 'The action will take some time to process, please do not worry',
+            icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
+        }))
+    }
+
+
 
     return (
         <HeaderWrapper width={width}>
@@ -72,7 +102,7 @@ const Header = ({ width }: HeaderProps) => {
                 <BoldRobotoText color='#FFFFFF'>EVAA</BoldRobotoText>
             </IconWithTextWrapper>
             <HeaderButtons>
-                {/* <TokensFaucet  onClick={getTokens}>Get testnet tokens</TokensFaucet > */}
+                <TokensFaucet  onClick={getTokens}>Get testnet tokens</TokensFaucet >
                 <AuthButton />
             </HeaderButtons>
         </HeaderWrapper>

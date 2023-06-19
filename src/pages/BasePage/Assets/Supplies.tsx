@@ -12,6 +12,8 @@ import { MySuppliesDescriptionBar, SupplyDescriptionBar } from '../../../compone
 import { SupplyModal } from '../../../components/Modals/SupplyModal';
 import { AssetsSubWrapper, AssetsSubtitle, AssetsTitle, AssetsWrapper } from './AssetsStyles';
 import { WithdrawModal } from '../../../components/Modals/WIthdrawModal';
+import ExclamationCircleIcon from '@heroicons/react/20/solid/ExclamationCircleIcon';
+import RocketLaunchIcon from '@heroicons/react/20/solid/RocketLaunchIcon';
 
 
 export interface SuppliesProps {
@@ -49,6 +51,27 @@ const Supplies = ({ tab }: SuppliesProps) => {
     const currentMySupplies = tab === '1' ? mySupplies : [];
     const currentSupplies = tab === '1' ? supplies : [];
 
+    const getTokens = () => {
+        fetch('https://evaa-testnet-faucet.herokuapp.com/api/v1/feed', {
+            method: "POST",
+            headers: {
+                Accept: "application/json, text/plain, */*",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                address: Address.parseRaw(wallet?.account.address ?? "").toString()
+            })
+        }).then(e => e.json()).then(e => (JSON.stringify(e) === `{"status":"denied"}`) ? notification.open({
+            message: 'You has already collected testnet tokens. You are only allowed to do this once.',
+            icon: <ExclamationCircleIcon color='red' width='32px' height='32px' />,
+        }) : notification.open({
+            message: 'You used the tokens faucet.',
+            description: 'The action will take some time to process, please do not worry',
+            icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
+        }))
+    }
+
+
     return (
         <>
             <Dialog className={`w-full h-full fixed bg-black bg-opacity-50 top-0 flex justify-center items-center`} open={!!selectedMySupply} onClose={() => setSelectedMySupply(undefined)}>
@@ -79,7 +102,7 @@ const Supplies = ({ tab }: SuppliesProps) => {
                 </AssetsSubWrapper>
                 <AssetsSubWrapper>
                     <AssetsTitle>Supply
-
+                    <TokensFaucet onClick={getTokens}>get testnet tokens</TokensFaucet >
 
                     </AssetsTitle>
                     {currentSupplies.length > 0 &&

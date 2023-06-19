@@ -86,7 +86,7 @@ export const TestnetHeader = styled.div`
     top: 0px;
     background-color: #0381C5;
 `
-export const TestnetHeaderInfo = styled.button`
+export const TestnetHeaderInfo = styled.div`
     font-family: 'Roboto';
     font-style: normal;
     font-weight: 700;
