@@ -77,7 +77,7 @@ export const MobileInfo = styled(BoldRobotoText)`
 `
 
 export const TestnetHeader = styled.div`
-    font-family: 'Roboto';
+    font-family: 'Roboto', sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -88,7 +88,7 @@ export const TestnetHeader = styled.div`
     background-color: #0381C5;
 `
 export const TestnetHeaderInfo = styled.div`
-    font-family: 'Roboto';
+    font-family: 'Roboto', sans-serif;
     font-style: normal;
     font-weight: 700;
     font-size: 16.1115px;
@@ -96,7 +96,7 @@ export const TestnetHeaderInfo = styled.div`
     color: white;
 `
 export const TestnetHeaderGuide = styled.button`
-    font-family: 'Roboto';
+    font-family: 'Roboto', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
