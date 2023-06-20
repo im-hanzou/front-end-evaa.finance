@@ -1,13 +1,9 @@
 import { create } from 'zustand';
-import { TonConnect, Wallet, isWalletInfoInjected, WalletInfoRemote } from '@tonconnect/sdk';
-import { BN } from 'bn.js'
+import { TonConnectUI, Wallet } from '@tonconnect/ui'
 import { fromNano, beginCell, toNano, Address } from 'ton';
 
-import { MASTER_EVAA_ADDRESS, USDT_EVAA_ADDRESS } from '@/config';
-import { isMobile, openLink, addReturnStrategy } from '@/utils';
-import { bufferToBigInt, friendlifyUserAddress } from '@/ton/utils';
-import { tonClient } from '@/ton/client';
-import { Minter } from '@/ton/minter';
+import { MASTER_EVAA_ADDRESS } from '@/config';
+import { friendlifyUserAddress } from '@/ton/utils';
 
 import { Token, TokenMap, useTokens } from './tokens';
 
@@ -21,12 +17,13 @@ export enum Action {
 }
 
 interface AuthStore {
+  isLogged: boolean;
   isLoading: boolean;
   isWaitingResponse: boolean;
   universalLink: string;
   userAddress: string;
 
-  connector: TonConnect,
+  connector: TonConnectUI,
   wallet: Wallet | null,
 
   logout: () => void;
@@ -38,7 +35,10 @@ interface AuthStore {
 }
 
 export const useWallet = create<AuthStore>((set, get) => {
-  const connector = new TonConnect(dappMetadata);
+  const connector = new TonConnectUI(dappMetadata);
+
+  // @ts-ignore
+  const isLogged = !!connector.walletInfoStorage.localStorage[connector.walletInfoStorage.storageKey];
 
   connector.onStatusChange((async (wallet) => {
     const userFriendlyAddress = friendlifyUserAddress(wallet?.account.address);
@@ -49,12 +49,9 @@ export const useWallet = create<AuthStore>((set, get) => {
     useTokens.getState().initTokens(userAddress);
   }), console.error);
 
-  connector.restoreConnection().then(() => {
-    set({ isLoading: false });
-  })
-
   return {
-    isLoading: true,
+    isLogged,
+    isLoading: false,
     isWaitingResponse: false,
     universalLink: '',
     userAddress: friendlifyUserAddress(connector?.wallet?.account.address),
@@ -76,28 +73,7 @@ export const useWallet = create<AuthStore>((set, get) => {
     ),
 
     login: async () => {
-      const walletsList = await connector.getWallets();
-      const embeddedWallet = walletsList.filter(isWalletInfoInjected).find((wallet) => wallet.embedded);
-      const tonkeeperConnectionWallet = walletsList.find((wallet) => wallet.name === "Tonkeeper") as WalletInfoRemote;
-
-      if (embeddedWallet) {
-        connector.connect({ jsBridgeKey: embeddedWallet.jsBridgeKey });
-        return;
-      }
-
-      const tonkeeperConnectionSource = {
-        universalLink: tonkeeperConnectionWallet.universalLink,
-        bridgeUrl: tonkeeperConnectionWallet.bridgeUrl,
-      };
-
-      const universalLink = connector.connect(tonkeeperConnectionSource) || '';
-
-      if (isMobile()) {
-        openLink(addReturnStrategy(universalLink, 'none'), '_blank');
-      } else {
-        set({ universalLink });
-      }
-
+      connector.connectWallet()
     },
 
     sendTransaction: async (amount: string, token: Token, action: Action) => {
@@ -105,10 +81,6 @@ export const useWallet = create<AuthStore>((set, get) => {
       const jettonAddress = useTokens.getState().tokens[token]?.address as Address;
       const nanoAmount = BigInt(Number(amount) * TokenMap[token].decimal);
       const address = MASTER_EVAA_ADDRESS.toString();
-
-      console.log('----------------------')
-      console.log(address, amount, nanoAmount, token, action)
-      console.log('----------------------')
       let messages = [];
 
       if (action === Action.withdraw || action === Action.borrow) {
@@ -121,7 +93,7 @@ export const useWallet = create<AuthStore>((set, get) => {
 
         messages.push({
           address,
-          amount: toNano('0.333').toString(),
+          amount: toNano('0.433').toString(),
           payload: body.toBoc().toString('base64'),
         });
       }
@@ -133,7 +105,7 @@ export const useWallet = create<AuthStore>((set, get) => {
 
           messages.push({
             address,
-            amount: nanoAmount.toString(),
+            amount: (nanoAmount + toNano('0.143')).toString(),
             payload: body.toBoc().toString('base64'),
           })
         } else {
@@ -148,13 +120,13 @@ export const useWallet = create<AuthStore>((set, get) => {
             .storeAddress(MASTER_EVAA_ADDRESS)
             .storeAddress(null) //responce add?
             .storeDict(null)
-            .storeCoins(toNano('0.1333'))
+            .storeCoins(toNano('0.2333'))
             .storeMaybeRef(null) //tons to be forwarded
             .endCell()
 
           messages.push({
             address: userJettonWalletAddress.toString(),
-            amount: toNano('0.222').toString(),
+            amount: toNano('0.333').toString(),
             payload: body.toBoc().toString('base64'),
           })
         }
@@ -168,6 +140,7 @@ export const useWallet = create<AuthStore>((set, get) => {
           messages
         });
 
+        // await connector.sendTransaction.provider()
         set({ isWaitingResponse: false });
 
       } catch (e) {

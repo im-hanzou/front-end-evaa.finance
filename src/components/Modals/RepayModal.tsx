@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { XMarkIcon, ExclamationCircleIcon, RocketLaunchIcon, ArrowLongRightIcon } from '@heroicons/react/20/solid';
 import { notification } from 'antd';
 
-import { formatPercent, formatUsd } from "@/utils";
+import { formatPercent, formatSmallValue, formatUsd } from "@/utils";
 import { Token, TokenMap, useTokens } from "@/store/tokens";
 import { useWallet, Action } from '@/store/wallet';
 import { MyBorrow, useBalance } from "@/store/balance";
@@ -142,6 +142,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
 
     const tokenAmount = watch("price");
     const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
+    const isMoreMin = Number(tokenAmount) < 1e-18;
 
     let limitUsedPercent = isMoreMax ?  borrowLimitPercent :
         getPrice(currentToken, tokenAmount) * borrowLimitPercent / borrowBalance;
@@ -158,11 +159,13 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
             
             notification.open({
                 message: 'Repay is successful',
-                description: 'The transaction will take some time to process, please do not worry',
+                description: 'The transaction will take about 30 seconds to process, please wait',
                 icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
+                duration: 60,
             });
 
-            useBalance.getState().initBalance();
+            // useBalance.getState().initBalance();
+            useBalance.getState().updateData();
 
             close();
 
@@ -182,7 +185,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
             <Title>Repay {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' step='any' max={borrow?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' step='any' min={1e-18} max={borrow?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch('price'))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -190,7 +193,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{borrow?.max} {ticker}</InfoText>
+                        <InfoText>{formatSmallValue(borrow?.max || 0)} {ticker}</InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>
@@ -202,7 +205,7 @@ export const RepayModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount} onClick={click}>Repay</ModalBtn>
+            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount || isMoreMin} onClick={click}>Repay</ModalBtn>
         </Dialog.Panel>
     )
 }

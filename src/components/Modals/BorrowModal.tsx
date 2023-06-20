@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { XMarkIcon, ExclamationCircleIcon, RocketLaunchIcon, ArrowLongRightIcon } from '@heroicons/react/20/solid';
 import { notification } from 'antd';
 
-import { formatPercent, formatUsd } from '@/utils';
+import { formatPercent, formatSmallValue, formatUsd } from '@/utils';
 import { useTokens, Token, TokenMap } from "@/store/tokens";
 import { Borrow, useBalance } from "@/store/balance";
 import { useWallet, Action } from '@/store/wallet';
@@ -142,12 +142,23 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
     const { sendTransaction, isWaitingResponse } = useWallet();
     const tokenAmount = watch("price");
     const isMoreMax = Number(tokenAmount) > (borrow?.max || 0);
+    const isMoreMin = Number(tokenAmount) < 1e-18;
 
     let limitUsedPercent = getPrice(currentToken, tokenAmount) * borrowLimitPercent / borrowBalance;
     let borrowBalanceTotal = isMoreMax ? formatUsd(0) : 
         formatUsd(Math.abs(Number(availableToBorrow) - getPrice(currentToken, tokenAmount)));
 
-    const limitUsedTotal = isMoreMax ? formatPercent(1) : formatPercent(borrowLimitPercent + limitUsedPercent ? limitUsedPercent : 0);
+    let limitUsedTotal;   
+    if (Number.isNaN(limitUsedPercent)) {
+        limitUsedTotal = formatPercent(getPrice(currentToken, tokenAmount) / Number(availableToBorrow))
+    } else {
+        limitUsedTotal = formatPercent(borrowLimitPercent + limitUsedPercent);
+    }
+
+    if (isMoreMax) {
+        limitUsedTotal = formatPercent(1)
+    }
+
 
 
     const click = async () => {
@@ -156,11 +167,13 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
             
             notification.open({
                 message: 'Borrow is successful',
-                description: 'The transaction will take some time to process, please do not worry',
+                description: 'The transaction will take about 30 seconds to process, please wait',
                 icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
+                duration: 60,
             });
             
-            useBalance.getState().initBalance();
+            // useBalance.getState().initBalance();
+            useBalance.getState().updateData();
 
             close();
 
@@ -180,7 +193,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
             <Title>Borrow {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' step='any' max={borrow?.max} maxLength={100} {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' step='any' min={1e-18} max={borrow?.max} maxLength={100} {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -188,7 +201,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{borrow?.max} {ticker}</InfoText>
+                        <InfoText>{formatSmallValue(borrow?.max || 0)} {ticker}</InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Borrow Limit Used</InfoText>
@@ -204,7 +217,7 @@ export const BorrowModal = ({ close, borrow }: SuppluModalProps) => {
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount} onClick={() => click()}>Borrow</ModalBtn>
+            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount || isMoreMin} onClick={() => click()}>Borrow</ModalBtn>
         </Dialog.Panel>
     )
 }

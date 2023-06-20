@@ -6,7 +6,7 @@ import { tonClient } from "./client";
 import { hexToString } from "./utils";
 
 export async function getUIVariables() {
-    let { stack } = await tonClient.runMethod(
+    let { stack } = await (await tonClient()).runMethod(
         MASTER_EVAA_ADDRESS,
         'getUIVariables',
     );
@@ -34,7 +34,6 @@ export async function getUIVariables() {
         }
         //@ts-ignore
     }, stack.readCellOpt());
-    console.log(assetDataDict)
     // 2 -----------POOL METADATA----
     //@ts-ignore
     const conf = stack.pop().cell.beginParse();

@@ -10,6 +10,7 @@ import { getAggregatedBalances } from '@/ton/getAggregatedBalances';
 import { calcApy } from '@/ton/utils';
 
 import { Token, useTokens } from './tokens';
+import { useWallet } from './wallet';
 
 export interface MySupply {
     id: string;
@@ -61,24 +62,24 @@ interface BalanceStore {
     // support
     userAddress?: Address;
     initBalance: (userAddress?: Address) => void;
+    updateData: () => void;
     isInitedUser: boolean;
     isLoading: boolean;
+    isReady: boolean;
 }
 
 export const useBalance = create<BalanceStore>((set, get) => {
     const initBalance = async (userAddress?: Address) => {
         if (userAddress) {
-            set({ userAddress })
+            set({ userAddress, isReady: false })
         }
 
         updateData();
     }
 
-
     const updateData = async () => {
         const { assetDataDict, assetConfigDict, dictRates, dictReserves } = await getUIVariables();
-
-        const userContractAddress = getUserContractAddress(get().userAddress);
+        const userContractAddress = getUserContractAddress(get()?.userAddress);
         const { aggregatedBalance1, aggregatedBalance2, isInitedUser } = !get().userAddress ? { aggregatedBalance1: BigInt(0), aggregatedBalance2: BigInt(0), isInitedUser: false } : await getAggregatedBalances({ userContractAddress, assetConfigDict, assetDataDict });
         set({ isInitedUser });
 
@@ -123,15 +124,7 @@ export const useBalance = create<BalanceStore>((set, get) => {
 
             // supplies
             const apySupply = ratesPerSecond ? calcApy({ rate: ratesPerSecond.s_rate_per_second }) : 0;
-            // console.log('--------------')
-            // console.log(assetTokenData?.price)
-            // console.log(1 / Number(assetTokenData?.price) / 1e9)
-            // console.log(- Math.log10(1 / Number(assetTokenData?.price) / 1e9))
-            // console.log(Math.ceil(- Math.log10(1 / (Number(assetTokenData?.price) / 1e9))))
-
             const accuracy = Math.max(Math.ceil(- Math.log10(1 / (Number(assetTokenData?.price) / 1e9))), 2);
-            // const balanceToDisplay = Number(balance.toFixed(accuracy));
-            console.log(accuracy)
 
             supplies.push({
                 id: String(tokenKey),
@@ -142,10 +135,11 @@ export const useBalance = create<BalanceStore>((set, get) => {
             });
 
             // borrows
+            let maxBorrowMath = Math.abs(Number(availableToBorrowData) / Number(assetTokenData?.price));
             const assetReserve = dictReserves.get(tokenData.hashKey)?.reserve;
             const apyBorrow = ratesPerSecond ? calcApy({ rate: ratesPerSecond.b_rate_per_second }) : 0;
             const liquidity = (Math.abs(Number(assetTokenData?.balance) - Number(assetReserve)) / token.decimal).toFixed(accuracy);
-            const maxBorrow = Math.min(Number(liquidity), Math.abs(Number(availableToBorrowData) / Number(assetTokenData?.price)));
+            const maxBorrow = Math.min(Number(liquidity), Number(maxBorrowMath));
 
             if (assetReserve) {
                 borrows.push({
@@ -175,11 +169,11 @@ export const useBalance = create<BalanceStore>((set, get) => {
                     s_rate: assetTokenData?.s_rate,
                     b_rate: assetTokenData?.b_rate
                 });
+                const balanceMath = Math.abs(Number(accountAssetBalance) / token.decimal);
+                const balance = balanceMath > 0.01 ? balanceMath.toFixed(accuracy) : balanceMath.toString();
 
-                const balance = Math.abs(Number(accountAssetBalance) / token.decimal).toFixed(accuracy);
 
                 const maxWithdraw = Math.min(Number(liquidity), Math.abs(Number(accountAssetBalance) / token.decimal));
-
 
                 if (accountAssetBalance > 0) {
                     mySupplies.push({
@@ -193,7 +187,9 @@ export const useBalance = create<BalanceStore>((set, get) => {
                 }
 
                 // myBorrows
-                const maxRepay = Math.min(Number(tokenData.balance), Number(Math.abs(Number(accountAssetBalance) / token.decimal))); //todo +t 
+                let maxRepayMath = Number(Math.abs(Number(accountAssetBalance) / token.decimal));
+
+                const maxRepay = Math.min(Number(tokenData.balance), maxRepayMath); //todo +t 
 
 
                 if (accountAssetBalance < 0) {
@@ -209,7 +205,9 @@ export const useBalance = create<BalanceStore>((set, get) => {
             }
         });
 
-        set({ supplies, borrows, mySupplies, myBorrows, isLoading: false });
+        const isReady = (get()?.userAddress?.toString() && useWallet.getState().isLogged) || !useWallet.getState().isLogged;
+
+        set({ supplies, borrows, mySupplies, myBorrows, isLoading: false, isReady });
     }
 
     setInterval(updateData, UPDATE_INTERVAL);
@@ -227,7 +225,9 @@ export const useBalance = create<BalanceStore>((set, get) => {
         borrows: [],
 
         initBalance,
+        updateData,
         isInitedUser: false,
         isLoading: true,
+        isReady: true
     }
 });

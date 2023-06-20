@@ -8,7 +8,7 @@ import { notification } from 'antd';
 import { Token, TokenMap, useTokens } from "@/store/tokens";
 import { Supply, useBalance } from "@/store/balance";
 import { useWallet, Action } from '@/store/wallet';
-import { formatPercent } from "@/utils";
+import { formatPercent, formatSmallValue } from "@/utils";
 
 import ModalConfirmButton from "../ModalConfirmButton";
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
@@ -144,11 +144,13 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
             
             notification.open({
                 message: 'Supply is successful',
-                description: 'The transaction will take some time to process, please do not worry',
+                description: 'The transaction will take about 30 seconds to process, please wait',
                 icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
+                duration: 60,
             });
 
-            useBalance.getState().initBalance();
+            // useBalance.getState().initBalance();
+            useBalance.getState().updateData();
 
             close();
 
@@ -162,6 +164,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
     }
 
     const isMoreMax = Number(tokenAmount) > (supply?.max || 0);
+    const isMoreMin = Number(tokenAmount) < 1e-18;
 
     return (
         <Dialog.Panel as={DialogStyled}>
@@ -169,7 +172,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
             <Title>Supply {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' step='any' max={supply?.max} maxLength={7} {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' step='any' min={1e-18} max={supply?.max} maxLength={7} {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -177,7 +180,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{supply?.max} {ticker}</InfoText>
+                        <InfoText>{formatSmallValue(supply?.max || 0)} {ticker}</InfoText>
                     </InfoTextWrapper>
                     <InfoTextWrapper>
                         <InfoText>Supply APY</InfoText>
@@ -185,7 +188,7 @@ export const SupplyModal = ({ close, supply }: SuppluModalProps) => {
                     </InfoTextWrapper>
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount} onClick={click}>Supply</ModalBtn>
+            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount || isMoreMin} onClick={click}>Supply</ModalBtn>
         </Dialog.Panel>
     )
 }

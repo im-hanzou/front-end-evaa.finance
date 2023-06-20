@@ -1,8 +1,9 @@
 import { AssetCardLogo, AssetCardText, AssetCardTextMobileHide, AssetCardTextSimple, AssetCardWrapper, AssetWrapper, DoubleTextLower, DoubleTextUpper, DoubleTextWrapper, DoubleTextWrapperMobileHide } from './AssetCardStyles';
 import { AssetCardButton } from '../../AssetCardButton';
+import { Skeleton } from 'antd';
 
 import { Token, useTokens, TokenMap } from '@/store/tokens';
-import { formatPercent } from '@/utils';
+import { formatPercent, formatValue } from '@/utils';
 
 export interface AssetCardProps {
     token: Token;
@@ -21,7 +22,7 @@ export const SupplyAssetCard = ({ onClick, token, balance, apy } : AssetCardProp
                 <AssetCardLogo src={TokenMap[token].icon}/>
                 <AssetCardTextSimple>{TokenMap[token].ticker}</AssetCardTextSimple>
             </AssetWrapper>
-            <AssetCardText right={42.5}>{balance} {TokenMap[token].ticker}</AssetCardText>
+            <AssetCardText right={42.5}>{formatValue(balance)} {TokenMap[token].ticker}</AssetCardText>
             <AssetCardTextMobileHide right={30.1}>{formatPercent(apy)}</AssetCardTextMobileHide>
             <AssetCardButton disabled={TokenMap[token].ticker === 'TOS'} onClick={onClick} right={0}>Supply</AssetCardButton>
         </AssetCardWrapper>
@@ -38,7 +39,7 @@ export const MySuppliesAssetCard = ({ onClick, token, balance, apy, earned } : A
                 <AssetCardTextSimple>{TokenMap[token].ticker}</AssetCardTextSimple>
             </AssetWrapper>
             <DoubleTextWrapper right={42.5}>
-                <DoubleTextUpper>{balance} {TokenMap[token].ticker}</DoubleTextUpper>
+                <DoubleTextUpper>{formatValue(balance)} {TokenMap[token].ticker}</DoubleTextUpper>
                 <DoubleTextLower>{formatToUsd(token, balance)}</DoubleTextLower>
             </DoubleTextWrapper>
             <DoubleTextWrapperMobileHide right={30.1}>
@@ -56,7 +57,7 @@ export const BorrowAssetCard = ({ onClick, token, liquidity, apy} : AssetCardPro
                 <AssetCardLogo src={TokenMap[token].icon}/>
                 <AssetCardTextSimple>{TokenMap[token].ticker}</AssetCardTextSimple>
             </AssetWrapper>
-            <AssetCardText right={42.5}>{liquidity} {TokenMap[token].ticker}</AssetCardText>
+            <AssetCardText right={42.5}>{formatValue(liquidity)} {TokenMap[token].ticker}</AssetCardText>
             <AssetCardTextMobileHide right={30.1}>{formatPercent(apy)}</AssetCardTextMobileHide>
             <AssetCardButton disabled={TokenMap[token].ticker === 'TOS'} onClick={onClick} right={0}>Borrow</AssetCardButton>
         </AssetCardWrapper>
@@ -72,7 +73,7 @@ export const MyBorrowsAssetCard = ({ onClick, token, balance, apy, accrued} : As
                 <AssetCardTextSimple>{TokenMap[token].ticker}</AssetCardTextSimple>
             </AssetWrapper>
             <DoubleTextWrapper right={42.5}>
-                <DoubleTextUpper>{balance} {TokenMap[token].ticker}</DoubleTextUpper>
+                <DoubleTextUpper>{formatValue(balance)} {TokenMap[token].ticker}</DoubleTextUpper>
                 <DoubleTextLower>{formatToUsd(token, balance)}</DoubleTextLower>
             </DoubleTextWrapper>
             <DoubleTextWrapperMobileHide right={30.1}>
@@ -85,3 +86,12 @@ export const MyBorrowsAssetCard = ({ onClick, token, balance, apy, accrued} : As
     )
 }
 
+export const AssetCardSkeleton = () => {    
+    return (
+        <AssetCardWrapper>
+            <Skeleton.Avatar active style={{ position: 'absolute', left: 0 }} />
+            <Skeleton.Button active block style={{ position: 'absolute', left: '6rem', right: '15rem', width: 'initial' }} />
+            <Skeleton.Button active style={{ position: 'absolute', right: 0, width: '12rem' }} />
+        </AssetCardWrapper>
+    )
+}

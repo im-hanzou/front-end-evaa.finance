@@ -18,7 +18,7 @@ export async function getAvailableToBorrow({ userContractAddress, assetDataDict,
 
     let availableToBorrowData = BigInt(0);
     try {
-        let stackUserAvlToBorr = await tonClient.runMethod(
+        let stackUserAvlToBorr = await (await tonClient()).runMethod(
             userContractAddress,
             'getAvailableToBorrow',
             argsUserAvl.build(),

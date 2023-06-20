@@ -26,9 +26,8 @@ export async function getAggregatedBalances({ userContractAddress, assetDataDict
     let aggregatedBalance1 = BigInt(0);
     let aggregatedBalance2 = BigInt(0);
     let isInitedUser = false;
-
     try {
-        const getAggregatedBalances = await tonClient.runMethod(
+        const getAggregatedBalances = await (await tonClient()).runMethod(
             userContractAddress,
             'getAggregatedBalances',
             argsUserBalanceas.build(),

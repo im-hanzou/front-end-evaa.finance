@@ -11,6 +11,7 @@ import { MySupply, useBalance } from '@/store/balance';
 import ModalConfirmButton from "../ModalConfirmButton";
 import { BoldRobotoText, RegularRobotoText } from "../Texts/MainTexts";
 import { AmountInDollars } from "./SupplyModal";
+import { formatSmallValue } from "@/utils";
 
 const DialogStyled = styled(Dialog.Panel)`
     position: relative;
@@ -130,11 +131,13 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
             
             notification.open({
                 message: 'Withdraw is successful',
-                description: 'The transaction will take some time to process, please do not worry',
+                description: 'The transaction will take about 30 seconds to process, please wait',
                 icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
+                duration: 60,
             });
 
-            useBalance.getState().initBalance();
+            // useBalance.getState().initBalance();
+            useBalance.getState().updateData();
 
             close();
 
@@ -148,6 +151,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
     }
 
     const isMoreMax = Number(tokenAmount) > (supply?.max || 0);
+    const isMoreMin = Number(tokenAmount) < 1e-18;
 
     return (
         <Dialog.Panel as={DialogStyled}>
@@ -155,7 +159,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
             <Title>Withdraw {ticker}</Title>
             <HelpWrapper>
                 <Subtitle>Amount</Subtitle>
-                <MyStyledInput type='number' step='any' max={supply?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
+                <MyStyledInput type='number' step='any' min={1e-18} max={supply?.max} maxLength={7}  {...register('price', { required: true, pattern: /^(0|[1-9]\d*)(\.\d+)?$/ })} placeholder="Enter amount" />
                 {watch("price") && <AmountInDollars>{formatToUsd(currentToken, watch("price"))}</AmountInDollars>}
             </HelpWrapper>
             <HelpWrapper>
@@ -163,7 +167,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
                 <InfoWrapper>
                     <InfoTextWrapper>
                         <InfoText>MAX</InfoText>
-                        <InfoText>{supply?.max} {ticker}</InfoText>
+                        <InfoText>{formatSmallValue(supply?.max || 0)} {ticker}</InfoText>
                     </InfoTextWrapper>
                     {/* <InfoTextWrapper>
                             <InfoText>Supply APY</InfoText>
@@ -171,7 +175,7 @@ export const WithdrawModal = ({ close, supply }: SuppluModalProps) => {
                         </InfoTextWrapper> */}
                 </InfoWrapper>
             </HelpWrapper>
-            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount} onClick={click}>Withdraw</ModalBtn>
+            <ModalBtn loading={isWaitingResponse} disabled={isMoreMax || !tokenAmount || isMoreMin} onClick={click}>Withdraw</ModalBtn>
         </Dialog.Panel>
     )
 }

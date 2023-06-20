@@ -1,5 +1,5 @@
 import Header from '../../components/Header/Header';
-import { BasePageContainer, ContentWrapper, TestnetInfo, TestnetMinor } from './BasePageStyles';
+import { BasePageContainer, ContentWrapper, TestnetInfo, TestnetMinor, TestnetHeader, TestnetHeaderInfo, TestnetHeaderGuide } from './BasePageStyles';
 import InfoBar from '../../components/BasePageComponents/InfoBar/InfoBar';
 import Supplies from './Assets/Supplies';
 import Borrows from './Assets/Borrows';
@@ -8,7 +8,6 @@ import { Tabs } from 'antd';
 import type { TabsProps } from 'antd';
 import styled from 'styled-components';
 import { useState } from 'react';
-import { BoldRobotoText } from '../../components/Texts/MainTexts';
 
 
 const StyledTabs = styled(Tabs)`
@@ -30,6 +29,9 @@ const StyledTabs = styled(Tabs)`
 
   .ant-tabs-tab:hover {
     color: #0381C5;
+  }
+  .ant-tabs-nav {
+    position: unset;
   }
 `
 
@@ -58,13 +60,17 @@ const mobileItems: TabsProps['items'] = [
 ];
 
 
+
 const BasePage = () => {
   const [ tab, setTab ] = useState('1');
   const isMobile = window.innerWidth < 480;
 
   return (
     <BasePageContainer>
-        <TestnetInfo><TestnetMinor>Configure your wallet for use with the</TestnetMinor> TESTNET</TestnetInfo>
+        <TestnetHeader>
+          <TestnetHeaderInfo>JOIN TEST NET - GET AIRDROP</TestnetHeaderInfo>
+          <TestnetHeaderGuide onClick={() => window.open("https://t.me/evaaprotocol/26")}>Guide</TestnetHeaderGuide>
+        </TestnetHeader>
         <Header />
         <InfoBar />
         <StyledTabs centered={isMobile} defaultActiveKey="1" items={isMobile ? mobileItems : items} onChange={setTab} />

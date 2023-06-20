@@ -41,19 +41,19 @@ type TokenMapType = {
 
 const getAddressByTokenId = async (tokenAddress: Address, ownerAddress?: Address) => {
     const contract = new Minter(tokenAddress);
-    return await tonClient.open(contract).getWalletAddress(ownerAddress ?? MASTER_EVAA_ADDRESS) as Address;
+    return await (await tonClient()).open(contract).getWalletAddress(ownerAddress ?? MASTER_EVAA_ADDRESS) as Address;
 }
 
 const getBalanceByTokenId = async (tokenAddress: Address, userAddress: Address, decimal: number) => {
     const contract = new Minter(tokenAddress);
-    const juserwalletEvaaMasterSC = await tonClient.open(contract).getWalletAddress(userAddress)
+    const juserwalletEvaaMasterSC = await (await tonClient()).open(contract).getWalletAddress(userAddress)
     const contract1 = new Minter(Address.parseFriendly(juserwalletEvaaMasterSC.toString()).address);
     let usdtBalance = '0';
     try {
-        const juserwalletEvaaMasterSC1 = await tonClient.open(contract1).getBalance()
+        const juserwalletEvaaMasterSC1 = await (await tonClient()).open(contract1).getBalance()
         usdtBalance = String(juserwalletEvaaMasterSC1.readNumber() / decimal);
     } catch (e) {
-        console.log('error with get usdtBalance', e)
+        console.log('error with get getBalanceByTokenId', e)
     }
     return usdtBalance;
 }
@@ -69,7 +69,7 @@ export const TokenMap: TokenMapType = {
         },
         async getBalance(userAddress: Address) {
 
-            return fromNano(await tonClient.getBalance(userAddress));
+            return fromNano(await (await tonClient()).getBalance(userAddress));
         }
     },
     [Token.USDT]: {

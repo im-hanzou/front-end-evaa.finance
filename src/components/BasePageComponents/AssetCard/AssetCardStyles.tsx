@@ -9,6 +9,7 @@ export const AssetCardWrapper = styled.div`
     padding: 4.4rem 0rem;
     
     @media only screen and (max-width: 480px) {
+        margin-top: 20px;
         padding: 0rem;
         height: 8rem;
     }  

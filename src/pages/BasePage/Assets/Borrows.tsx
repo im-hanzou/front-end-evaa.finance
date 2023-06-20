@@ -4,7 +4,7 @@ import { Dialog } from '@headlessui/react';
 import { useBalance, Borrow, MyBorrow } from '@/store/balance';
 import { useWallet } from '@/store/wallet';
 
-import { BorrowAssetCard, MyBorrowsAssetCard } from '../../../components/BasePageComponents/AssetCard/AssetCard';
+import { AssetCardSkeleton, BorrowAssetCard, MyBorrowsAssetCard } from '../../../components/BasePageComponents/AssetCard/AssetCard';
 import { AssetsSubtitle, AssetsSubWrapper, AssetsTitle, AssetsWrapper } from './AssetsStyles';
 import { BorrowDescriptionBar, MyBorrowsDescriptionBar } from '../../../components/BasePageComponents/AssetsDescriptionBar/AssetsDescriptionBar';
 import { BorrowModal } from '../../../components/Modals/BorrowModal';
@@ -17,7 +17,7 @@ export interface BorrowsProps {
 
 const Borrows = ({ tab }: BorrowsProps) => {
     const { callIfLoged: callIfLogin } = useWallet();
-    const { myBorrows, borrows } = useBalance();
+    const { myBorrows, borrows, isReady } = useBalance();
     const [selectedMyBorrow, setSelectedMyBorrow] = useState<MyBorrow | undefined>();
     const [selectedBorrow, setSelectedBorrow] = useState<Borrow | undefined>();
     const currentMyBorrows = tab === '1' ? myBorrows : [];
@@ -33,15 +33,18 @@ const Borrows = ({ tab }: BorrowsProps) => {
             </Dialog>
             <AssetsSubWrapper>
                 <AssetsTitle>Your Borrows</AssetsTitle>
-                {currentMyBorrows.length > 0 &&
+                {(!isReady || currentMyBorrows.length > 0) &&
                     <MyBorrowsDescriptionBar />
                 }
-                {!currentMyBorrows.length &&
+                {isReady && !currentMyBorrows.length &&
                     <AssetsSubtitle>Nothing borrowed yet</AssetsSubtitle>
                 }
                 {currentMyBorrows.map(myBorrow => (
                     <MyBorrowsAssetCard {...myBorrow} key={myBorrow.id} onClick={callIfLogin(() => setSelectedMyBorrow(myBorrow))} />
                 ))}
+                {!isReady &&
+                    <AssetCardSkeleton />
+                }
             </AssetsSubWrapper>
             <AssetsSubWrapper>
                 <AssetsTitle>Borrow</AssetsTitle>

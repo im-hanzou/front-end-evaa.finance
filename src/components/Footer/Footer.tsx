@@ -19,7 +19,7 @@ const Footer = () => {
         <FooterWrapper>
             TWA version: <FooterLink href="https://t.me/EvaaAppBot" target="_blank">@EvaaAppBot</FooterLink>
             <br/>
-            Need help? <FooterLink href="https://t.me/alexuniverse12" target="_blank">t.me/alexuniverse12</FooterLink>
+            Need help? <FooterLink href="https://t.me/EvaaProtocolHub" target="_blank">t.me/EvaaProtocolHub</FooterLink>
         </FooterWrapper>
     )
 }

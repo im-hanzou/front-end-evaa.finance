@@ -3,12 +3,13 @@ import { AuthButton } from '../../components/AuthButton/AuthButton';
 import { BoldRobotoText } from '../Texts/MainTexts';
 import EvaaLogo from '../../assets/pictures/evaa_logo.png'
 import { useNavigate } from 'react-router';
-import { Address } from 'ton'
 import { useWallet, Action } from '@/store/wallet';
+import { Address } from 'ton'
 import { notification } from 'antd';
 import ExclamationCircleIcon from '@heroicons/react/20/solid/ExclamationCircleIcon';
 import RocketLaunchIcon from '@heroicons/react/20/solid/RocketLaunchIcon';
 import ModalConfirmButton from '../ModalConfirmButton';
+
 export interface HeaderProps {
     width?: string;
 }
@@ -83,8 +84,7 @@ const Header = ({ width }: HeaderProps) => {
                 address: Address.parseRaw(wallet?.account.address ?? "").toString()
             })
         }).then(e => e.json()).then(e => (JSON.stringify(e) === `{"status":"denied"}`) ? notification.open({
-            message: 'You can use the tokens faucet only once.',
-            description: 'Please, wait until tokens appear on your balance',
+            message: 'You has already collected testnet tokens. You are only allowed to do this once.',
             icon: <ExclamationCircleIcon color='red' width='32px' height='32px' />,
         }) : notification.open({
             message: 'You used the tokens faucet.',
@@ -92,6 +92,7 @@ const Header = ({ width }: HeaderProps) => {
             icon: <RocketLaunchIcon color='#0381C5' width='32px' height='32px' />,
         }))
     }
+
 
 
     return (

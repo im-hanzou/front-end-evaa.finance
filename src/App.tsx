@@ -56,6 +56,4 @@ const App: React.FunctionComponent<AppProps> = props => {
         </Router>
     );
 }
-
-//deploy ping
 export default App;
